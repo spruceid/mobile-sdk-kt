@@ -1,7 +1,8 @@
 package com.spruceid.walletsdk
 
-import android.support.test.InstrumentationRegistry
-import android.support.test.runner.AndroidJUnit4
+import androidx.test.InstrumentationRegistry
+import androidx.test.runner.AndroidJUnit4
+import com.spruceid.walletandroidsdk.helloRust
 
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -20,5 +21,6 @@ class ExampleInstrumentedTest {
         // Context of the app under test.
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
         assertEquals("com.spruceid.walletsdk.test", appContext.packageName)
+        assertEquals(helloRust(), "Hello from Rust!")
     }
 }
