@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.spruceid.walletandroidsdk.BaseCredential
+import com.spruceid.walletandroidsdk.helloRust
 import com.spruceid.walletsdkexample.ui.theme.WalletSdkTheme
 
 class MainActivity : ComponentActivity() {
@@ -31,7 +32,7 @@ class MainActivity : ComponentActivity() {
 fun Greeting(name: String, modifier: Modifier = Modifier) {
     val cred = BaseCredential("id")
     Text(
-            text = "Hello ${cred.getId()}!",
+            text = helloRust(),
             modifier = modifier
     )
 }

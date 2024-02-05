@@ -1,5 +1,10 @@
 package com.spruceid.walletandroidsdk
 
+import com.spruceid.wallet.sdk.rs.helloFfi
+
+fun helloRust(): String {
+    return helloFfi()
+}
 class BaseCredential constructor(private val id: String?) {
 
     fun getId(): String {
