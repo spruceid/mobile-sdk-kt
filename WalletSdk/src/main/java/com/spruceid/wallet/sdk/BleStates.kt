@@ -1,4 +1,4 @@
-package com.spruceid.walletandroidsdk
+package com.spruceid.wallet.sdk
 
 enum class BleStates(val string: String) {
     Scanning("scanning"),

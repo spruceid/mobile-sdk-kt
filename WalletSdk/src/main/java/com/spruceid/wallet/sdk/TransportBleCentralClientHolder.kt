@@ -1,4 +1,4 @@
-package com.spruceid.walletandroidsdk
+package com.spruceid.wallet.sdk
 
 import android.app.Activity
 import android.bluetooth.BluetoothAdapter
@@ -6,10 +6,6 @@ import android.bluetooth.BluetoothManager
 import android.bluetooth.le.ScanResult
 import android.content.Context
 import android.util.Log
-import androidx.annotation.NonNull
-import com.spruceid.wallet.sdk.rs.RequestData
-import com.spruceid.wallet.sdk.rs.handleRequest
-import com.spruceid.wallet.sdk.rs.submitResponse
 import java.util.*
 
 /**

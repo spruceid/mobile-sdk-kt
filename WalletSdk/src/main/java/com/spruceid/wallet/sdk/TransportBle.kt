@@ -1,9 +1,7 @@
-package com.spruceid.walletandroidsdk
+package com.spruceid.wallet.sdk
 
 import android.bluetooth.BluetoothManager
 import android.util.Log
-import androidx.annotation.NonNull
-import com.spruceid.wallet.sdk.rs.RequestData
 import java.util.*
 
 /**

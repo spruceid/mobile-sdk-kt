@@ -1,4 +1,4 @@
-package com.spruceid.walletandroidsdk
+package com.spruceid.wallet.sdk
 
 import android.bluetooth.le.*
 import android.os.Handler
@@ -6,18 +6,12 @@ import android.os.ParcelUuid
 import java.util.*
 
 import android.Manifest
-import android.app.Activity
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothManager
 import android.content.Context
 import android.content.Context.*
 import android.content.pm.PackageManager
 import android.os.Build
-import android.util.Log
-import androidx.core.app.ActivityCompat
-import com.spruceid.wallet.sdk.rs.initialiseSession
-import kotlinx.coroutines.CompletableDeferred
-import java.lang.reflect.Method
 
 class BleCentral(private var callback: BleCentralCallback,
                  private var serviceUUID: UUID,

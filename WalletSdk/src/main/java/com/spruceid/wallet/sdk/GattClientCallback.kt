@@ -1,6 +1,6 @@
-package com.spruceid.walletandroidsdk
+package com.spruceid.wallet.sdk
 
-abstract class GattServerCallback {
+abstract class GattClientCallback {
     open fun onPeerConnected() {}
     open fun onPeerDisconnected() {}
     open fun onMessageReceived(data: ByteArray) {}

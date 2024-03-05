@@ -2,7 +2,7 @@ package com.spruceid.walletsdkexample
 
 import android.bluetooth.le.ScanResult
 import android.util.Log
-import com.spruceid.walletandroidsdk.BleCentralCallback
+import com.spruceid.wallet.sdk.BleCentralCallback
 
 class BleCentralCallbackHandler: BleCentralCallback() {
     override fun onScanResult(callbackType: Int, result: ScanResult) {

@@ -1,9 +1,14 @@
-import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
-
 plugins {
     id("com.android.library")
     id("org.jetbrains.kotlin.android")
     `maven-publish`
+}
+
+tasks {
+    val sourcesJar by creating(Jar::class) {
+        archiveClassifier.set("sources")
+        from(android.sourceSets.getByName("main").java.srcDirs)
+    }
 }
 
 publishing {
@@ -17,10 +22,10 @@ publishing {
         // Creates a Maven publication called "release".
         create<MavenPublication>("release") {
             afterEvaluate {
-                groupId = "com.spruceid"
+                groupId = "com.spruceid.wallet.sdk"
                 artifactId = "walletsdk"
                 version = "0.0.1"
-                artifact(tasks.getByName("bundleReleaseAar"))
+                artifact(tasks.getByName<Jar>("sourcesJar"))
             }
         }
     }
@@ -56,7 +61,7 @@ android {
 }
 
 dependencies {
-    api("com.spruceid.wallet.sdk.rs:walletsdkrs:0.0.6")
+    api("com.spruceid.wallet.sdk.rs:walletsdkrs:0.0.23")
     implementation("com.android.support:appcompat-v7:28.0.0")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("com.android.support.test:runner:1.0.2")

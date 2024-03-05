@@ -1,4 +1,4 @@
-package com.spruceid.walletandroidsdk
+package com.spruceid.wallet.sdk
 
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.le.AdvertiseCallback

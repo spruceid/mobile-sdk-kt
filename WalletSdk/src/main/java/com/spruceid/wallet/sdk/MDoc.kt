@@ -1,4 +1,4 @@
-package com.spruceid.walletandroidsdk
+package com.spruceid.wallet.sdk
 
 import android.util.Log
 import com.spruceid.wallet.sdk.rs.MDoc as InnerMDoc

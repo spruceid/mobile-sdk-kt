@@ -1,4 +1,4 @@
-package com.spruceid.walletandroidsdk
+package com.spruceid.wallet.sdk
 
 import android.bluetooth.BluetoothManager
 import android.util.Log
@@ -13,7 +13,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import java.security.KeyStore
 import java.security.Signature
-import java.util.Base64
 import java.util.UUID
 
 class CredentialsViewModel : ViewModel() {
