@@ -41,7 +41,7 @@ jobs:
         arguments: publish
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        VERSION: ${{ github.event.inputs.version }}
+        VERSION: ${{ github.ref_name }}
     - name: Publish package to Central
       uses: gradle/gradle-build-action@v2
       with:
@@ -49,4 +49,4 @@ jobs:
       env:
         MAVEN_USERNAME: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
         MAVEN_PASSWORD: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
-        VERSION: ${{ github.event.inputs.version }}
+        VERSION: ${{ github.ref_name }}
