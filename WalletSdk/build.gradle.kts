@@ -10,7 +10,7 @@ publishing {
     repositories {
         maven {
             name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/spruceid/wallet-sdk-rs")
+            url = uri("https://maven.pkg.github.com/spruceid/wallet-sdk")
             credentials {
                 username = System.getenv("GITHUB_ACTOR")
                 password = System.getenv("GITHUB_TOKEN")
