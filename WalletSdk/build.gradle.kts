@@ -2,31 +2,74 @@ plugins {
     id("com.android.library")
     id("org.jetbrains.kotlin.android")
     `maven-publish`
-}
-
-tasks {
-    val sourcesJar by creating(Jar::class) {
-        archiveClassifier.set("sources")
-        from(android.sourceSets.getByName("main").java.srcDirs)
-    }
+    id("signing")
+    id("com.gradleup.nmcp")
 }
 
 publishing {
     repositories {
         maven {
-            url = uri("")
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/spruceid/wallet-sdk-rs")
+            credentials {
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
+            }
         }
     }
-
     publications {
         // Creates a Maven publication called "release".
         create<MavenPublication>("release") {
+            groupId = "com.spruceid.wallet.sdk"
+            artifactId = "walletsdk"
+            version = System.getenv("VERSION")
+
             afterEvaluate {
-                groupId = "com.spruceid.wallet.sdk"
-                artifactId = "walletsdk"
-                version = "0.0.1"
-                artifact(tasks.getByName<Jar>("sourcesJar"))
+                from(components["release"])
             }
+
+            pom {
+                packaging = "aar"
+                name.set("walletsdk")
+                description.set("Android SpruceID Wallet SDK")
+                url.set("https://github.com/spruceid/wallet-sdk-kt")
+                licenses {
+                    license {
+                        name.set("MIT License")
+                        url.set("https://opensource.org/license/mit/")
+                    }
+                    license {
+                        name.set("Apache License, Version 2.0")
+                        url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+                    }
+                }
+                developers {
+                    developer {
+                        name.set("Spruce Systems, Inc.")
+                        email.set("hello@spruceid.com")
+                    }
+                }
+                scm {
+                    url.set(pom.url.get())
+                    connection.set("scm:git:${url.get()}.git")
+                    developerConnection.set("scm:git:${url.get()}.git")
+                }
+            }
+        }
+    }
+}
+
+signing {
+    useGpgCmd()
+    sign(publishing.publications["release"])
+}
+
+nmcp {
+    afterEvaluate {
+        publish("release") {
+            username = System.getenv("MAVEN_USERNAME")
+            password = System.getenv("MAVEN_PASSWORD")
+            publicationType = "AUTOMATIC"
         }
     }
 }
@@ -57,6 +100,13 @@ android {
 
     kotlinOptions {
         jvmTarget = "1.8"
+    }
+
+    publishing {
+        singleVariant("release") {
+            withSourcesJar()
+            withJavadocJar()
+        }
     }
 }
 
