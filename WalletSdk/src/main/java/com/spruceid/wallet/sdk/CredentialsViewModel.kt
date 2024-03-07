@@ -128,8 +128,5 @@ class CredentialsViewModel : ViewModel() {
             _currState.value = PresentmentState.ERROR
             throw e
         }
-
     }
-
-
 }
