@@ -383,11 +383,6 @@ class GattClient(private var callback: GattClientCallback,
             val descriptor: BluetoothGattDescriptor =
                 characteristicServer2Client!!.getDescriptor(clientCharacteristicConfigUuid)
 
-            if (descriptor == null) {
-                callback.onError(Error("Error getting Server2Client clientCharacteristicConfig desc."))
-                return
-            }
-
             descriptor.value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
 
             if (!gatt.writeDescriptor(descriptor)) {

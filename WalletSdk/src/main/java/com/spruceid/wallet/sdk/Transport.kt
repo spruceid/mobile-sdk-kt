@@ -22,6 +22,7 @@ class Transport(private var bluetoothManager: BluetoothManager) {
         deviceRetrievalOption: String,
         ident: ByteArray,
         updateRequestData: (data: ByteArray) -> Unit,
+        callback: BLESessionStateDelegate
     ) {
 
         /**
@@ -41,6 +42,7 @@ class Transport(private var bluetoothManager: BluetoothManager) {
                 deviceRetrievalOption,
                 ident,
                 updateRequestData,
+                callback
             )
         }
 
