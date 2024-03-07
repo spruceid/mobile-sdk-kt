@@ -87,6 +87,7 @@ public class BLESessionManager {
             val signatureData = submitSignature(this.sessionManager!!, signature)
             this.state = signatureData.state
             this.bleManager!!.send(signatureData.response)
+            this.callback.update(mapOf(Pair("success", "")))
         } catch (e: Error) {
             Log.e("CredentialsViewModel.submitNamespaces", e.toString())
             this.callback.update(mapOf(Pair("error", e.toString())))
