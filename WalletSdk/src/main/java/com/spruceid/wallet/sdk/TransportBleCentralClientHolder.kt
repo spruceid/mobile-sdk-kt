@@ -17,7 +17,7 @@ class TransportBleCentralClientHolder(
     private var bluetoothManager: BluetoothManager,
     private var serviceUUID: UUID,
     private var updateRequestData: (data: ByteArray) -> Unit,
-    private var callback: BLESessionStateDelegate,
+    private var callback: BLESessionStateDelegate?,
 ) : Activity() {
 
     private var context: Context = this
@@ -96,7 +96,7 @@ class TransportBleCentralClientHolder(
                     "progress: $progress max: $max"
                 )
 
-                callback.update(mapOf(Pair("progress", mapOf(Pair("curr", progress), Pair("max", max)))))
+                callback?.update(mapOf(Pair("progress", mapOf(Pair("curr", progress), Pair("max", max)))))
             }
 
             override fun onMessageReceived(data: ByteArray) {

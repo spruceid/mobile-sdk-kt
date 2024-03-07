@@ -89,7 +89,8 @@ class CredentialsViewModel : ViewModel() {
                 "BLE",
                 "Central",
                 _session.value!!.bleIdent.toByteArray(),
-                ::updateRequestData
+                ::updateRequestData,
+                null
             )
     }
 

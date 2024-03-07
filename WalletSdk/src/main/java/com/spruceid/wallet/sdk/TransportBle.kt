@@ -30,7 +30,7 @@ class TransportBle(private var bluetoothManager: BluetoothManager) {
         application: String, serviceUUID: UUID,
         deviceRetrievalOption: String, ident: ByteArray,
         updateRequestData: (data: ByteArray) -> Unit,
-        callback: BLESessionStateDelegate
+        callback: BLESessionStateDelegate?
     ) {
 
         /**
