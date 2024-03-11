@@ -4,6 +4,7 @@ import android.bluetooth.BluetoothManager
 import android.util.Log
 import com.spruceid.wallet.sdk.rs.ItemsRequest
 import com.spruceid.wallet.sdk.rs.SessionManager
+import com.spruceid.wallet.sdk.rs.SessionManagerEngaged
 import com.spruceid.wallet.sdk.rs.initialiseSession
 import com.spruceid.wallet.sdk.rs.handleRequest
 import com.spruceid.wallet.sdk.rs.submitResponse
@@ -20,7 +21,7 @@ public class BLESessionManager {
 
     val callback: BLESessionStateDelegate
     val uuid: UUID
-    var state: String = ""
+    var state: SessionManagerEngaged? = null
     var sessionManager: SessionManager? = null
     var itemsRequests: List<ItemsRequest> = listOf()
     val mdoc: MDoc
@@ -59,9 +60,8 @@ public class BLESessionManager {
     }
 
     fun submitNamespaces(items: Map<String, Map<String, List<String>>>) {
-        val responseData = submitResponse(
+        val payload = submitResponse(
             this.sessionManager!!,
-            this.itemsRequests,
             items
         )
 
@@ -79,15 +79,14 @@ public class BLESessionManager {
         }
 
         try {
-            val signer = Signature.getInstance("ECDSA")
+            val signer = Signature.getInstance("SHA256withECDSA")
             signer.initSign(entry.privateKey)
 
-            signer.update(responseData.payload)
+            signer.update(payload)
 
             val signature = signer.sign()
-            val signatureData = submitSignature(this.sessionManager!!, signature)
-            this.state = signatureData.state
-            this.bleManager!!.send(signatureData.response)
+            val response = submitSignature(this.sessionManager!!, signature)
+            this.bleManager!!.send(response)
         } catch (e: Error) {
             Log.e("CredentialsViewModel.submitNamespaces", e.toString())
             this.callback.update(mapOf(Pair("error", e.toString())))
@@ -96,7 +95,7 @@ public class BLESessionManager {
     }
 
     fun updateRequestData(data: ByteArray) {
-        val requestData = handleRequest(this.state, data)
+        val requestData = handleRequest(this.state!!, data)
         this.sessionManager = requestData.sessionManager
         this.itemsRequests = requestData.itemsRequests
         this.callback.update(mapOf(Pair("selectNamespaces", requestData.itemsRequests)))

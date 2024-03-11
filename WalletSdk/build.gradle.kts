@@ -111,7 +111,7 @@ android {
 }
 
 dependencies {
-    api("com.spruceid.wallet.sdk.rs:walletsdkrs:0.0.23")
+    api("com.spruceid.wallet.sdk.rs:walletsdkrs:0.0.25")
     implementation("com.android.support:appcompat-v7:28.0.0")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("com.android.support.test:runner:1.0.2")
