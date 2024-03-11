@@ -96,9 +96,8 @@ class CredentialsViewModel : ViewModel() {
 
     fun submitNamespaces(allowedNamespaces: Map<String, Map<String, List<String>>>) {
         val firstMDoc: MDoc = _credentials.value.first() as MDoc
-        val responseData = submitResponse(
+        val payload = submitResponse(
             _requestData.value!!.sessionManager,
-            _requestData.value!!.itemsRequests,
             allowedNamespaces
         )
 
@@ -117,12 +116,12 @@ class CredentialsViewModel : ViewModel() {
         }
 
         try {
-            val signer = Signature.getInstance("ECDSA")
+            val signer = Signature.getInstance("SHA256withECDSA")
             signer.initSign(entry.privateKey)
-            signer.update(responseData.payload)
+            signer.update(payload)
             val signature = signer.sign()
-            val signatureData = submitSignature(_requestData.value!!.sessionManager, signature)
-            _transport.value!!.send(signatureData.response)
+            val response = submitSignature(_requestData.value!!.sessionManager, signature)
+            _transport.value!!.send(response)
             _currState.value = PresentmentState.SUCCESS
         } catch (e: Error) {
             Log.e("CredentialsViewModel.submitNamespaces", e.toString())
