@@ -80,6 +80,7 @@ class TransportBleCentralClientHolder(
                     "TransportBleCentralClientHolder.gattClientCallback.onPeerConnected",
                     "Peer Connected"
                 )
+                callback?.update(mapOf(Pair("connected", "")))
             }
 
             override fun onPeerDisconnected() {
@@ -87,6 +88,7 @@ class TransportBleCentralClientHolder(
                     "TransportBleCentralClientHolder.gattClientCallback.onPeerDisconnected",
                     "Peer Disconnected"
                 )
+                callback?.update(mapOf(Pair("disconnected", "")))
                 gattClient.disconnect()
             }
 
@@ -96,7 +98,11 @@ class TransportBleCentralClientHolder(
                     "progress: $progress max: $max"
                 )
 
-                callback?.update(mapOf(Pair("progress", mapOf(Pair("curr", progress), Pair("max", max)))))
+                if(progress == max) {
+                    callback?.update(mapOf(Pair("success", "")))
+                } else {
+                    callback?.update(mapOf(Pair("uploadProgress", mapOf(Pair("curr", progress), Pair("max", max)))))
+                }
             }
 
             override fun onMessageReceived(data: ByteArray) {
@@ -110,6 +116,7 @@ class TransportBleCentralClientHolder(
                     updateRequestData(data)
                 } catch (e: Error) {
                     Log.e("MDoc", e.toString())
+                    callback?.update(mapOf(Pair("error", e)))
                 }
             }
 
