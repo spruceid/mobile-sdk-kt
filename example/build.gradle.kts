@@ -10,7 +10,7 @@ android {
     defaultConfig {
         applicationId = "com.spruceid.walletsdkexample"
         minSdk = 26
-        targetSdk = 33
+        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
 
@@ -38,6 +38,9 @@ android {
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.4.3"
+    }
+    lint {
+        disable += "ObsoleteLintCustomCheck"
     }
     packaging {
         resources {
