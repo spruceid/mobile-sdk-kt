@@ -17,7 +17,7 @@ import java.util.UUID
 
 class CredentialsViewModel : ViewModel() {
 
-    private val _credentials = MutableStateFlow<List<BaseCredential>>(listOf())
+    private val _credentials = MutableStateFlow<ArrayList<BaseCredential>>(arrayListOf())
     val credentials = _credentials.asStateFlow()
 
     private val _currState = MutableStateFlow(PresentmentState.UNINITIALIZED)
@@ -37,8 +37,8 @@ class CredentialsViewModel : ViewModel() {
 
     private val _transport = MutableStateFlow<Transport?>(null)
 
-    fun storeCredental(credential: BaseCredential) {
-        _credentials.value = _credentials.value.plus(credential)
+    fun storeCredential(credential: BaseCredential) {
+        _credentials.value.add(credential)
     }
 
     fun toggleAllowedNamespace(docType: String, specName: String, fieldName: String) {

@@ -12,14 +12,18 @@ import android.content.Context
 import android.content.Context.*
 import android.content.pm.PackageManager
 import android.os.Build
+import android.os.Looper
+import android.util.Log
 
-class BleCentral(private var callback: BleCentralCallback,
-                 private var serviceUUID: UUID,
-                 bluetoothAdapter: BluetoothAdapter) {
+class BleCentral(
+    private var callback: BleCentralCallback,
+    private var serviceUUID: UUID,
+    bluetoothAdapter: BluetoothAdapter
+) {
 
     private val bluetoothLeScanner = bluetoothAdapter.bluetoothLeScanner
     private var scanning = false
-    private val handler = Handler()
+    private val handler = Handler(Looper.myLooper()!!)
 
     // Limits scanning to 3 min - preserves battery life - ideally should be lower.
     private val scanPeriod: Long = 180000
