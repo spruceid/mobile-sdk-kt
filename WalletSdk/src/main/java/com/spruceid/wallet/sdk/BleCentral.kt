@@ -113,8 +113,10 @@ class BleCentral(private var callback: BleCentralCallback,
         }
     }
 }
- fun getPermissions(): List<String> {
-    var permissions = listOf(Manifest.permission.ACCESS_FINE_LOCATION)
+
+fun getPermissions(): List<String> {
+    val permissions =
+        arrayListOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)
 
     /**
      * The OS seems to omit certain permission requests like "BLUETOOTH" to the user depending
@@ -122,13 +124,13 @@ class BleCentral(private var callback: BleCentralCallback,
      * a permission that can never be accepted.
      */
     if (Build.VERSION.SDK_INT >= 31) {
-        permissions.plus(Manifest.permission.BLUETOOTH_SCAN)
-        permissions.plus(Manifest.permission.BLUETOOTH_ADVERTISE)
-        permissions.plus(Manifest.permission.BLUETOOTH_CONNECT)
+        permissions.add(Manifest.permission.BLUETOOTH_SCAN)
+        permissions.add(Manifest.permission.BLUETOOTH_ADVERTISE)
+        permissions.add(Manifest.permission.BLUETOOTH_CONNECT)
     } else {
-        Manifest.permission.BLUETOOTH
-        Manifest.permission.BLUETOOTH_ADMIN
-        Manifest.permission.BLUETOOTH_PRIVILEGED
+        permissions.add(Manifest.permission.BLUETOOTH)
+        permissions.add(Manifest.permission.BLUETOOTH_ADMIN)
+        permissions.add(Manifest.permission.BLUETOOTH_PRIVILEGED)
     }
 
     return permissions
