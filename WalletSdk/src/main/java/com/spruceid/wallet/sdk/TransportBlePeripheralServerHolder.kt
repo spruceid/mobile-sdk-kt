@@ -12,7 +12,7 @@ import java.util.*
  * The responsibility of this class is to advertise data and be available for connection. AKA Holder.
  * 18013-5 section 8.3.3.1.1.4 Table 12.
  */
-class TransportBlePeripheralServerHolder(@NonNull private var application: String,
+class TransportBlePeripheralServerHolder(private var application: String,
                                          private var bluetoothManager: BluetoothManager,
                                          private var serviceUUID: UUID): Activity() {
 
@@ -43,6 +43,7 @@ class TransportBlePeripheralServerHolder(@NonNull private var application: Strin
          */
         val blePeripheralCallback: BlePeripheralCallback = object : BlePeripheralCallback() {
             override fun onStartSuccess(settingsInEffect: AdvertiseSettings) {}
+
             override fun onStartFailure(errorCode: Int) {}
 
             override fun onState(state: String) {

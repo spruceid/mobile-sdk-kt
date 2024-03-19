@@ -1,13 +1,24 @@
 package com.spruceid.wallet.sdk
 
-import android.bluetooth.*
+import android.bluetooth.BluetoothDevice
+import android.bluetooth.BluetoothGatt
+import android.bluetooth.BluetoothGattCallback
+import android.bluetooth.BluetoothGattCharacteristic
+import android.bluetooth.BluetoothGattDescriptor
+import android.bluetooth.BluetoothGattService
+import android.bluetooth.BluetoothProfile
+import android.bluetooth.BluetoothStatusCodes
 import android.content.Context
 import android.os.Build
 import android.util.Log
 import java.io.ByteArrayOutputStream
 import java.lang.reflect.InvocationTargetException
-import java.util.*
+import java.util.ArrayDeque
+import java.util.Arrays
+import java.util.Queue
+import java.util.UUID
 import kotlin.math.min
+
 
 /**
  * GATT client responsible for consuming data sent from a GATT server.
@@ -52,7 +63,7 @@ class GattClient(private var callback: GattClientCallback,
             callback.onLog("onConnectionStateChange")
 
             if (newState == BluetoothProfile.STATE_CONNECTED) {
-                clearCache(gatt)
+                clearCache()
 
                 callback.onState(BleStates.GattClientConnected.string)
                 callback.onLog("Gatt Client is connected.")
@@ -174,20 +185,20 @@ class GattClient(private var callback: GattClientCallback,
         /**
          * Detecting character read and validating the expected characteristic.
          */
+        @Deprecated("Deprecated in Java")
         override fun onCharacteristicRead(gatt: BluetoothGatt,
                                           characteristic: BluetoothGattCharacteristic, status: Int) {
 
             callback.onLog("onCharacteristicRead, uuid=${characteristic.uuid} status=$status")
-
+            @Suppress("deprecation")
+            val value = characteristic.value
             /**
              * 18013-5 section 8.3.3.1.1.3.
              */
             if (characteristic.uuid.equals(characteristicIdentUuid)) {
-                val charIdentValue = characteristic.value
+                callback.onLog("Received identValue: ${byteArrayToHex(value)}.")
 
-                callback.onLog("Received identValue: ${byteArrayToHex(charIdentValue)}.")
-
-                if (!Arrays.equals(charIdentValue, identValue)) {
+                if (!Arrays.equals(value, identValue)) {
                     callback.onLog("Warning: Received ident does not match expected ident.")
                 }
 
@@ -225,27 +236,46 @@ class GattClient(private var callback: GattClientCallback,
                     val stateDescriptor: BluetoothGattDescriptor =
                         characteristicState!!.getDescriptor(clientCharacteristicConfigUuid)
 
-                    if (stateDescriptor == null) {
-                        callback.onError(Error("Error getting State clientCharacteristicConfig desc."))
-                        return
-                    }
-
                     Log.d("GattClient.onDescriptorWrite","-- descriptor value --\n${(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE)}")
 
-                    stateDescriptor.value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        val res = gatt.writeDescriptor(stateDescriptor, BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE)
+                        if(res != BluetoothStatusCodes.SUCCESS) {
+                            callback.onError(Error("Error writing to Server2Client. Code: $res"))
+                            return
+                        }
+                    } else {
+                        // Above code addresses the deprecation but requires API 33+
+                        @Suppress("deprecation")
+                        stateDescriptor.value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
 
-                    if (!gatt.writeDescriptor(stateDescriptor)) {
-                        callback.onError(Error("Error writing to State clientCharacteristicConfig desc."))
+                        @Suppress("deprecation")
+                        if (!gatt.writeDescriptor(stateDescriptor)) {
+                            callback.onError(Error("Error writing to Server2Client clientCharacteristicConfig: desc."))
+                            return
+                        }
                     }
+
                 } else if (charUuid.equals(characteristicStateUuid)
                     && descriptor.uuid.equals(clientCharacteristicConfigUuid)
                 ) {
 
                     // Finally we've set everything up, we can write 0x01 to state to signal
                     // to the other end (mDL reader) that it can start sending data to us..
-                    characteristicState!!.value = byteArrayOf(0x01.toByte())
-                    if (!gattClient!!.writeCharacteristic(characteristicState)) {
-                        callback.onError(Error("Error writing to state characteristic."))
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        val res = gatt.writeCharacteristic(characteristicState!!, byteArrayOf(0x01.toByte()), BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT)
+                        if(res != BluetoothStatusCodes.SUCCESS) {
+                            callback.onError(Error("Error writing to Server2Client. Code: $res"))
+                            return
+                        }
+                    } else {
+                        // Above code addresses the deprecation but requires API 33+
+                        @Suppress("deprecation")
+                        characteristicState!!.value = byteArrayOf(0x01.toByte())
+                        @Suppress("deprecation")
+                        if (!gatt.writeCharacteristic(characteristicState)) {
+                            callback.onError(Error("Error writing to state characteristic."))
+                        }
                     }
                 } else {
                     callback.onError(Error("Unexpected onDescriptorWrite for characteristic UUID $charUuid " +
@@ -299,28 +329,28 @@ class GattClient(private var callback: GattClientCallback,
         /**
          * Detect characteristic change and inspect incoming message.
          */
+        @Deprecated("Deprecated in Java")
         override fun onCharacteristicChanged(gatt: BluetoothGatt,
                                              characteristic: BluetoothGattCharacteristic) {
 
             callback.onLog("onCharacteristicChanged, uuid=${characteristic.uuid}")
-
+            @Suppress("deprecation")
+            val value = characteristic.value
             if (characteristic.uuid.equals(characteristicServer2ClientUuid)) {
-                val data = characteristic.value
-
-                if (data.isEmpty()) {
-                    callback.onError(Error("Invalid data length ${data.size} for Server2Client " +
+                if (value.isEmpty()) {
+                    callback.onError(Error("Invalid data length ${value.size} for Server2Client " +
                             "characteristic."))
                     return
                 }
 
-                Log.d("GattClient.onCharacteristicChanged", byteArrayToHex(data))
+                Log.d("GattClient.onCharacteristicChanged", byteArrayToHex(value))
 
-                incomingMessage.write(data, 1, data.size - 1)
+                incomingMessage.write(value, 1, value.size - 1)
 
-                callback.onLog("Received chunk with ${data.size} bytes (last=${data[0].toInt() == 0x00}), " +
+                callback.onLog("Received chunk with ${value.size} bytes (last=${value[0].toInt() == 0x00}), " +
                         "incomingMessage.length=${incomingMessage.toByteArray().size}")
 
-                if (data[0].toInt() == 0x00) {
+                if (value[0].toInt() == 0x00) {
                     /**
                      * Last message.
                      */
@@ -328,30 +358,28 @@ class GattClient(private var callback: GattClientCallback,
 
                     incomingMessage.reset()
                     callback.onMessageReceived(entireMessage)
-                } else if (data[0].toInt() == 0x01) {
+                } else if (value[0].toInt() == 0x01) {
                     // Message size is three less than MTU, as opcode and attribute handle take up 3 bytes.
-                    if (data.size > mtu - 3) {
-                        callback.onError(Error("Invalid size ${data.size} of data written Server2Client " +
+                    if (value.size > mtu - 3) {
+                        callback.onError(Error("Invalid size ${value.size} of data written Server2Client " +
                                 "characteristic, expected maximum size ${mtu - 3}."))
                         return
                     }
                 } else {
-                    callback.onError(Error("Invalid first byte ${data[0]} in Server2Client data chunk, " +
+                    callback.onError(Error("Invalid first byte ${value[0]} in Server2Client data chunk, " +
                             "expected 0 or 1."))
                     return
                 }
             } else if (characteristic.uuid.equals(characteristicStateUuid)) {
-                val data = characteristic.value
-
-                if (data.size != 1) {
-                    callback.onError(Error("Invalid data length ${data.size} for state characteristic."))
+                if (value.size != 1) {
+                    callback.onError(Error("Invalid data length ${value.size} for state characteristic."))
                     return
                 }
 
-                if (data[0].toInt() == 0x02) {
+                if (value[0].toInt() == 0x02) {
                     callback.onTransportSpecificSessionTermination()
                 } else {
-                    callback.onError(Error("Invalid byte ${data[0]} for state characteristic."))
+                    callback.onError(Error("Invalid byte ${value[0]} for state characteristic."))
                 }
             }
         }
@@ -383,12 +411,24 @@ class GattClient(private var callback: GattClientCallback,
             val descriptor: BluetoothGattDescriptor =
                 characteristicServer2Client!!.getDescriptor(clientCharacteristicConfigUuid)
 
-            descriptor.value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                val res = gatt.writeDescriptor(descriptor, BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE)
+                if(res != BluetoothStatusCodes.SUCCESS) {
+                    callback.onError(Error("Error writing to Server2Client. Code: $res"))
+                    return
+                }
+            } else {
+                // Above code addresses the deprecation but requires API 33+
+                @Suppress("deprecation")
+                descriptor.value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
 
-            if (!gatt.writeDescriptor(descriptor)) {
-                callback.onError(Error("Error writing to Server2Client clientCharacteristicConfig: desc."))
-                return
+                @Suppress("deprecation")
+                if (!gatt.writeDescriptor(descriptor)) {
+                    callback.onError(Error("Error writing to Server2Client clientCharacteristicConfig: desc."))
+                    return
+                }
             }
+
         } catch (error: SecurityException) {
             callback.onError(error)
         }
@@ -408,12 +448,23 @@ class GattClient(private var callback: GattClientCallback,
 
         callback.onLog("Sending chunk with ${chunk.size} bytes (last=${chunk[0].toInt() == 0x00})")
 
-        characteristicClient2Server!!.value = chunk
 
         try {
-            if (!gattClient!!.writeCharacteristic(characteristicClient2Server)) {
-                callback.onError(Error("Error writing to Client2Server characteristic"))
-                return
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                val res = gattClient!!.writeCharacteristic(characteristicClient2Server!!, chunk, BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT)
+                if(res != BluetoothStatusCodes.SUCCESS) {
+                    callback.onError(Error("Error writing to Server2Client. Code: $res"))
+                    return
+                }
+            } else {
+                // Above code addresses the deprecation but requires API 33+
+                @Suppress("deprecation")
+                characteristicClient2Server!!.value = chunk
+                @Suppress("deprecation")
+                if (!gattClient!!.writeCharacteristic(characteristicClient2Server)) {
+                    callback.onError(Error("Error writing to Client2Server characteristic"))
+                    return
+                }
             }
         } catch (error: SecurityException) {
             callback.onError(error)
@@ -426,20 +477,8 @@ class GattClient(private var callback: GattClientCallback,
     /**
      * Clears the GATT state. Needing to access a private function in GATT.
      */
-    private fun clearCache(gatt: BluetoothGatt) {
+    private fun clearCache() {
         try {
-//      val refreshMethod: Method = gatt.getClass().getMethod("refresh")
-//      val refreshMethod: Method = gatt::class.declaredMemberFunctions.find
-//      var result = false
-
-//      if (refreshMethod != null) {
-//        result = refreshMethod.invoke(gatt)
-//      }
-//      if (result) {
-//          callback.onLog("BluetoothGatt.refresh() invoked successfully.")
-//      } else {
-//          callback.onLog("BluetoothGatt.refresh() invoked but returned false.")
-//      }
         } catch (error: NoSuchMethodException) {
             callback.onError(error)
         } catch (error: IllegalAccessException) {
@@ -504,14 +543,24 @@ class GattClient(private var callback: GattClientCallback,
      */
     fun sendTransportSpecificTermination() {
         val terminationCode = byteArrayOf(0x02.toByte())
-
-        if (characteristicState != null) {
-            characteristicState!!.value = terminationCode
-        }
-
         try {
-            if (gattClient != null && !gattClient!!.writeCharacteristic(characteristicState)) {
-                callback.onError(Error("Error writing to state characteristic."))
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                val res = gattClient!!.writeCharacteristic(characteristicState!!, terminationCode, BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT)
+                if(res != BluetoothStatusCodes.SUCCESS) {
+                    callback.onError(Error("Error writing to state characteristic. Code: $res"))
+                    return
+                }
+            } else {
+                // Above code addresses the deprecation but requires API 33+
+                if (characteristicState != null) {
+                    @Suppress("deprecation")
+                    characteristicState!!.value = terminationCode
+                }
+
+                @Suppress("deprecation")
+                if (gattClient != null && !gattClient!!.writeCharacteristic(characteristicState)) {
+                    callback.onError(Error("Error writing to state characteristic."))
+                }
             }
         } catch (error: SecurityException) {
             callback.onError(error)
