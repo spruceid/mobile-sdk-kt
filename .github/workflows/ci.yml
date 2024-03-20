@@ -28,22 +28,22 @@ jobs:
           arguments: lintDebug
           build-root-directory: ./
 
-      - name: Setup Java JDK
-        uses: actions/setup-java@v3
-        with:
-          java-version: "18"
-          distribution: "temurin"
-
   test:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Setup Java JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: "18"
+          distribution: "temurin"
+
       - name: Validate Gradle wrapper
         uses: gradle/wrapper-validation-action@v1
 
-      - name: lint
+      - name: test
         uses: gradle/gradle-build-action@v2
         with:
           arguments: test
