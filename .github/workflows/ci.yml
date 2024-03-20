@@ -28,8 +28,13 @@ jobs:
           arguments: lintDebug
           build-root-directory: ./
 
+      - name: Setup Java JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: "18"
+          distribution: "temurin"
+
   test:
-    needs: [lint]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
