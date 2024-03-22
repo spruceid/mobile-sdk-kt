@@ -12,14 +12,18 @@ import android.content.Context
 import android.content.Context.*
 import android.content.pm.PackageManager
 import android.os.Build
+import android.os.Looper
+import android.util.Log
 
-class BleCentral(private var callback: BleCentralCallback,
-                 private var serviceUUID: UUID,
-                 bluetoothAdapter: BluetoothAdapter) {
+class BleCentral(
+    private var callback: BleCentralCallback,
+    private var serviceUUID: UUID,
+    bluetoothAdapter: BluetoothAdapter
+) {
 
     private val bluetoothLeScanner = bluetoothAdapter.bluetoothLeScanner
     private var scanning = false
-    private val handler = Handler()
+    private val handler = Handler(Looper.myLooper()!!)
 
     // Limits scanning to 3 min - preserves battery life - ideally should be lower.
     private val scanPeriod: Long = 180000
@@ -113,8 +117,10 @@ class BleCentral(private var callback: BleCentralCallback,
         }
     }
 }
- fun getPermissions(): List<String> {
-    var permissions = listOf(Manifest.permission.ACCESS_FINE_LOCATION)
+
+fun getPermissions(): List<String> {
+    val permissions =
+        arrayListOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)
 
     /**
      * The OS seems to omit certain permission requests like "BLUETOOTH" to the user depending
@@ -122,13 +128,13 @@ class BleCentral(private var callback: BleCentralCallback,
      * a permission that can never be accepted.
      */
     if (Build.VERSION.SDK_INT >= 31) {
-        permissions.plus(Manifest.permission.BLUETOOTH_SCAN)
-        permissions.plus(Manifest.permission.BLUETOOTH_ADVERTISE)
-        permissions.plus(Manifest.permission.BLUETOOTH_CONNECT)
+        permissions.add(Manifest.permission.BLUETOOTH_SCAN)
+        permissions.add(Manifest.permission.BLUETOOTH_ADVERTISE)
+        permissions.add(Manifest.permission.BLUETOOTH_CONNECT)
     } else {
-        Manifest.permission.BLUETOOTH
-        Manifest.permission.BLUETOOTH_ADMIN
-        Manifest.permission.BLUETOOTH_PRIVILEGED
+        permissions.add(Manifest.permission.BLUETOOTH)
+        permissions.add(Manifest.permission.BLUETOOTH_ADMIN)
+        permissions.add(Manifest.permission.BLUETOOTH_PRIVILEGED)
     }
 
     return permissions

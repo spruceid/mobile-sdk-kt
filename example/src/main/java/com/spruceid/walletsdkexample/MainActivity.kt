@@ -3,6 +3,7 @@ package com.spruceid.walletsdkexample
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -51,7 +52,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             val viewModel by viewModels<CredentialsViewModel>()
 
-            viewModel.storeCredental(generateMDoc())
+            viewModel.storeCredential(generateMDoc())
 
             WalletSdkTheme {
                 // A surface container using the 'background' color from the theme
