@@ -1,6 +1,7 @@
 package com.spruceid.wallet.sdk.ui
 
 import android.graphics.ImageFormat
+import android.os.Build
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
 import com.google.zxing.BarcodeFormat
@@ -15,13 +16,13 @@ class QrCodeAnalyzer(
     private val onQrCodeScanned: (String) -> Unit,
 ) : ImageAnalysis.Analyzer {
 
-  private val supportedImageFormats = mutableListOf(YUV_420_888)
+    private val supportedImageFormats = mutableListOf(ImageFormat.YUV_420_888)
 
-  init {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-      supportedImageFormats.addAll(listOf(YUV_422_888, YUV_444_888))
+    init {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            supportedImageFormats.addAll(listOf(ImageFormat.YUV_422_888, ImageFormat.YUV_444_888))
+        }
     }
-  }
 
     override fun analyze(image: ImageProxy) {
         if (image.format in supportedImageFormats) {
@@ -37,11 +38,11 @@ class QrCodeAnalyzer(
                     image.height,
                     false,
                 ).crop(
-          (image.width * 0.1f).toInt(),
-          (image.height * 0.3f).toInt(),
-          (image.width * 0.8f).toInt(),
-          (image.height * 0.5f).toInt(),
-        )
+                    (image.width * 0.1f).toInt(),
+                    (image.height * 0.3f).toInt(),
+                    (image.width * 0.8f).toInt(),
+                    (image.height * 0.5f).toInt(),
+                )
             val binaryBmp = BinaryBitmap(HybridBinarizer(source))
             try {
                 val result =
