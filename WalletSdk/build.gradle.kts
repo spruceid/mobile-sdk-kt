@@ -102,6 +102,13 @@ android {
         jvmTarget = "1.8"
     }
 
+    buildFeatures {
+        compose = true
+        viewBinding = true
+    }
+
+    composeOptions { kotlinCompilerExtensionVersion = "1.5.11" }
+
     publishing {
         singleVariant("release") {
             withSourcesJar()
@@ -114,6 +121,14 @@ dependencies {
     api("com.spruceid.wallet.sdk.rs:walletsdkrs:0.0.25")
     //noinspection GradleCompatible
     implementation("com.android.support:appcompat-v7:28.0.0")
+    /* Begin UI dependencies */
+    implementation("androidx.compose.material3:material3:1.2.1")
+    implementation("androidx.camera:camera-camera2:1.3.2")
+    implementation("androidx.camera:camera-lifecycle:1.3.2")
+    implementation("androidx.camera:camera-view:1.3.2")
+    implementation("com.google.zxing:core:3.3.3")
+    implementation("com.google.accompanist:accompanist-permissions:0.34.0")
+    /* End UI dependencies */
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("com.android.support.test:runner:1.0.2")
     androidTestImplementation("com.android.support.test.espresso:espresso-core:3.0.2")
