@@ -54,6 +54,7 @@ fun QRCodeScanner(
     subtitle: String = "Please align within the guides",
     cancelButtonLabel: String = "Cancel",
     onRead: (content: String) -> Unit,
+    isMatch: (content: String) -> Boolean = {_ -> true},
     onCancel: () -> Unit,
     fontFamily: FontFamily = FontFamily.Default,
     guidesColor: Color = Color.White,
@@ -120,10 +121,12 @@ fun QRCodeScanner(
                                 .build()
                         imageAnalysis.setAnalyzer(
                             ContextCompat.getMainExecutor(context),
-                            QrCodeAnalyzer { result ->
-                                onRead(result)
-                                code = result
-                            },
+                            QrCodeAnalyzer(
+                                isMatch = isMatch,
+                                onQrCodeScanned = { result ->
+                                    onRead(result)
+                                    code = result
+                                }),
                         )
                         try {
                             cameraProviderFuture.get().bindToLifecycle(

@@ -14,6 +14,7 @@ import java.nio.ByteBuffer
 
 class QrCodeAnalyzer(
     private val onQrCodeScanned: (String) -> Unit,
+    private val isMatch: (content: String) -> Boolean = {_ -> true},
 ) : ImageAnalysis.Analyzer {
 
     private val supportedImageFormats = mutableListOf(ImageFormat.YUV_420_888)
@@ -56,7 +57,9 @@ class QrCodeAnalyzer(
                             ),
                         )
                     }.decode(binaryBmp)
-                onQrCodeScanned(result.text)
+                if (isMatch(result.text)) {
+                    onQrCodeScanned(result.text)
+                }
             } catch (e: Exception) {
                 e.printStackTrace()
             } finally {
