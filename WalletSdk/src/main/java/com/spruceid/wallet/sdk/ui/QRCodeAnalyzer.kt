@@ -38,11 +38,6 @@ class QrCodeAnalyzer(
                     image.width,
                     image.height,
                     false,
-                ).crop(
-                    (image.width * 0.1f).toInt(),
-                    (image.height * 0.3f).toInt(),
-                    (image.width * 0.8f).toInt(),
-                    (image.height * 0.5f).toInt(),
                 )
             val binaryBmp = BinaryBitmap(HybridBinarizer(source))
             try {
