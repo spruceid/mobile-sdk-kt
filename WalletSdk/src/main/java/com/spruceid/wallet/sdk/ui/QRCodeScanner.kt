@@ -1,5 +1,6 @@
 package com.spruceid.wallet.sdk.ui
 
+import android.util.Range
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST
@@ -95,7 +96,7 @@ fun QRCodeScanner(
             ) {
                 AndroidView(
                     factory = { context ->
-                        val screenSize = android.util.Size(1280, 720)
+                        val screenSize = android.util.Size(1920, 1080)
                         val resolutionSelector =
                             ResolutionSelector
                                 .Builder()
@@ -108,7 +109,10 @@ fun QRCodeScanner(
                                 .build()
                         val previewView = PreviewView(context)
                         val preview =
-                            Preview.Builder().setResolutionSelector(resolutionSelector).build()
+                            Preview.Builder()
+                                .setTargetFrameRate(Range(20, 45))
+                                .setResolutionSelector(resolutionSelector)
+                                .build()
                         val selector =
                             CameraSelector.Builder()
                                 .requireLensFacing(CameraSelector.LENS_FACING_BACK)
