@@ -131,8 +131,6 @@ dependencies {
     implementation("androidx.test.ext:junit-ktx:1.1.5")
     /* End UI dependencies */
     testImplementation("junit:junit:4.13.2")
-    testImplementation("org.robolectric:robolectric:4.8")
-    testImplementation("org.mockito:mockito-core:4.3.1")
 
     androidTestImplementation("com.android.support.test:runner:1.0.2")
     androidTestImplementation("com.android.support.test.espresso:espresso-core:3.0.2")

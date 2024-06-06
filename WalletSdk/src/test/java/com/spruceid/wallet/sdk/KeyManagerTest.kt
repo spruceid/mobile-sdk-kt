@@ -5,7 +5,7 @@ import org.junit.Test
 import org.junit.Assert.*
 
 /**
- * Example local unit test, which will execute on the development machine (host).
+ * Tests for KeyManager supporting functions.
  *
  * See [testing documentation](http://d.android.com/tools/testing).
  */
