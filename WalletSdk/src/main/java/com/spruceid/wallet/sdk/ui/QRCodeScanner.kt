@@ -1,9 +1,13 @@
 package com.spruceid.wallet.sdk.ui
 
+import android.content.res.Resources
 import android.util.Range
+import android.view.Surface
+import androidx.camera.core.CameraControl
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST
+import androidx.camera.core.ImageCapture
 import androidx.camera.core.Preview
 import androidx.camera.core.resolutionselector.ResolutionSelector
 import androidx.camera.core.resolutionselector.ResolutionStrategy
@@ -49,6 +53,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 
+
 @Composable
 fun QRCodeScanner(
     title: String = "Scan QR Code",
@@ -88,6 +93,7 @@ fun QRCodeScanner(
         "QR code line animation",
     )
 
+
     Column(
         modifier = Modifier.fillMaxSize(),
     ) {
@@ -96,22 +102,11 @@ fun QRCodeScanner(
             ) {
                 AndroidView(
                     factory = { context ->
-                        val screenSize = android.util.Size(1920, 1080)
-                        val resolutionSelector =
-                            ResolutionSelector
-                                .Builder()
-                                .setResolutionStrategy(
-                                    ResolutionStrategy(
-                                        screenSize,
-                                        ResolutionStrategy.FALLBACK_RULE_CLOSEST_HIGHER
-                                    )
-                                )
-                                .build()
                         val previewView = PreviewView(context)
                         val preview =
                             Preview.Builder()
                                 .setTargetFrameRate(Range(20, 45))
-                                .setResolutionSelector(resolutionSelector)
+                                .setTargetRotation(Surface.ROTATION_0)
                                 .build()
                         val selector =
                             CameraSelector.Builder()
@@ -121,8 +116,8 @@ fun QRCodeScanner(
                         val imageAnalysis =
                             ImageAnalysis.Builder()
                                 .setBackpressureStrategy(STRATEGY_KEEP_ONLY_LATEST)
-                                .setResolutionSelector(resolutionSelector)
                                 .build()
+
                         imageAnalysis.setAnalyzer(
                             ContextCompat.getMainExecutor(context),
                             QrCodeAnalyzer(
@@ -132,13 +127,21 @@ fun QRCodeScanner(
                                     code = result
                                 }),
                         )
+                        var cameraControl: CameraControl? = null
                         try {
-                            cameraProviderFuture.get().bindToLifecycle(
-                                lifecycleOwner,
-                                selector,
-                                preview,
-                                imageAnalysis,
-                            )
+                            cameraControl = cameraProviderFuture
+                                .get()
+                                .bindToLifecycle(
+                                    lifecycleOwner,
+                                    selector,
+                                    preview,
+                                    imageAnalysis,
+                                ).cameraControl
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
+                        try {
+                            cameraControl?.setZoomRatio(2f)
                         } catch (e: Exception) {
                             e.printStackTrace()
                         }
