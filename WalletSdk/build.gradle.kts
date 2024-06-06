@@ -128,6 +128,7 @@ dependencies {
     implementation("androidx.camera:camera-view:1.3.2")
     implementation("com.google.zxing:core:3.3.3")
     implementation("com.google.accompanist:accompanist-permissions:0.34.0")
+    implementation("androidx.test.ext:junit-ktx:1.1.5")
     /* End UI dependencies */
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.robolectric:robolectric:4.8")

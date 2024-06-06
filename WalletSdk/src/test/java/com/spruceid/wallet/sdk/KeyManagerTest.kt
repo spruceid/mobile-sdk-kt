@@ -1,61 +1,38 @@
 package com.spruceid.wallet.sdk
 
-import org.junit.Assert
 import org.junit.Test
 
 import org.junit.Assert.*
-import org.junit.runner.RunWith
-
-import org.robolectric.RobolectricTestRunner
-import org.robolectric.annotation.Config
 
 /**
  * Example local unit test, which will execute on the development machine (host).
  *
  * See [testing documentation](http://d.android.com/tools/testing).
  */
-//@RunWith(RobolectricTestRunner::class)
-//@Config(sdk = [30])
 class KeyManagerTest {
 
     @Test
-    fun getKeyStore() {
+    fun clampOrFill() {
         val keyManager = KeyManager()
-        val keyStore = keyManager.getKeyStore()
 
-        assertNotNull(keyStore)
-    }
+        // Greater than 32
+        val inputMoreThan = ByteArray(33) { it.toByte() }
+        val expectedMoreThan = inputMoreThan.drop(1).toByteArray()
+        val resultMoreThan = keyManager.clampOrFill(inputMoreThan)
 
-    @Test
-    fun reset() {
-        Assert.assertEquals(4, 2 + 2)
-    }
+        assertArrayEquals(expectedMoreThan, resultMoreThan)
 
-    @Test
-    fun generateSigningKey() {
-    }
+        // Less than 32.
+        val inputLessThan = ByteArray(30) { it.toByte() }
+        val expectedLessThan = ByteArray(2) { 0.toByte() } + inputLessThan
+        val result = keyManager.clampOrFill(inputLessThan)
 
-    @Test
-    fun getJwk() {
-    }
+        assertArrayEquals(expectedLessThan, result)
 
-    @Test
-    fun keyExists() {
-    }
+        // Equal to 32.
+        val inputEqualTo = ByteArray(32) { it.toByte() }
+        val resultEqualTo = keyManager.clampOrFill(inputEqualTo)
 
-    @Test
-    fun signPayload() {
-    }
-
-    @Test
-    fun generateEncryptionKey() {
-    }
-
-    @Test
-    fun encryptPayload() {
-    }
-
-    @Test
-    fun decryptPayload() {
+        assertArrayEquals(inputEqualTo, resultEqualTo)
     }
 }

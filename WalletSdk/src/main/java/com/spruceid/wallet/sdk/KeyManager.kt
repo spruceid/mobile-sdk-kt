@@ -26,8 +26,7 @@ class KeyManager {
      * Returns the Android Keystore.
      * @return instance of the key store.
      */
-    @VisibleForTesting
-    fun getKeyStore(): KeyStore {
+    private fun getKeyStore(): KeyStore {
         return KeyStore.getInstance("AndroidKeyStore").apply {
             load(null)
         }
@@ -139,7 +138,7 @@ class KeyManager {
      * @property input byte array to be processed.
      * @return byte array with 32 bytes.
      */
-    private fun clampOrFill(input: ByteArray): ByteArray {
+    fun clampOrFill(input: ByteArray): ByteArray {
         return if (input.size > 32) {
             input.drop(1).toByteArray()
         } else if (input.size < 32) {
