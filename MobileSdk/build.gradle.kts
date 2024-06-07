@@ -131,6 +131,7 @@ dependencies {
     implementation("androidx.camera:camera-mlkit-vision:1.3.0-alpha06")
     implementation("com.google.android.gms:play-services-mlkit-text-recognition:19.0.0")
     /* End UI dependencies */
+    implementation("androidx.datastore:datastore-preferences:1.1.1")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("com.android.support.test:runner:1.0.2")
     androidTestImplementation("com.android.support.test.espresso:espresso-core:3.0.2")
