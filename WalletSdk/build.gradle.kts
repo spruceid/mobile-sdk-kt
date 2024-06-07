@@ -76,7 +76,7 @@ nmcp {
 
 
 android {
-    namespace = "com.spruceid.walletsdk"
+    namespace = "com.spruceid.wallet.sdk"
     compileSdk = 33
 
     defaultConfig {
@@ -128,8 +128,10 @@ dependencies {
     implementation("androidx.camera:camera-view:1.3.2")
     implementation("com.google.zxing:core:3.3.3")
     implementation("com.google.accompanist:accompanist-permissions:0.34.0")
+    implementation("androidx.test.ext:junit-ktx:1.1.5")
     /* End UI dependencies */
     testImplementation("junit:junit:4.13.2")
+
     androidTestImplementation("com.android.support.test:runner:1.0.2")
     androidTestImplementation("com.android.support.test.espresso:espresso-core:3.0.2")
 }
