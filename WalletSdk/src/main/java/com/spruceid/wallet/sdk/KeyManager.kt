@@ -6,7 +6,6 @@ import android.security.keystore.KeyProperties
 import android.util.Base64
 import android.util.Log
 import androidx.annotation.RequiresApi
-import org.jetbrains.annotations.VisibleForTesting
 import java.security.KeyPairGenerator
 import java.security.KeyStore
 import java.security.Signature
