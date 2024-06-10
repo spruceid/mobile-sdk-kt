@@ -126,7 +126,7 @@ dependencies {
     implementation("androidx.camera:camera-camera2:1.3.2")
     implementation("androidx.camera:camera-lifecycle:1.3.2")
     implementation("androidx.camera:camera-view:1.3.2")
-    implementation("com.google.zxing:core:3.3.3")
+    implementation("com.google.zxing:core:3.5.1")
     implementation("com.google.accompanist:accompanist-permissions:0.34.0")
     implementation("androidx.test.ext:junit-ktx:1.1.5")
     /* End UI dependencies */
