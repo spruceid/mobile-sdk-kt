@@ -26,12 +26,16 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import com.spruceid.wallet.sdk.ConnectionLiveData
 import com.spruceid.wallet.sdk.CredentialsViewModel
 import com.spruceid.wallet.sdk.MDoc
 import com.spruceid.wallet.sdk.PresentmentState
@@ -47,10 +51,22 @@ import java.security.spec.PKCS8EncodedKeySpec
 import java.util.Base64
 
 class MainActivity : ComponentActivity() {
+    private lateinit var connectionLiveData: ConnectionLiveData
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContent {
             val viewModel by viewModels<CredentialsViewModel>()
+            var isConnected by remember { mutableStateOf(false) }
+
+            connectionLiveData = ConnectionLiveData(this)
+
+            connectionLiveData.observe(this) { isNetworkAvailable ->
+                isNetworkAvailable?.let {
+                    isConnected = it
+                }
+            }
 
             viewModel.storeCredential(generateMDoc())
 
@@ -96,7 +112,7 @@ class MainActivity : ComponentActivity() {
                                             viewModel.present(getBluetoothManager(baseContext)!!)
                                         }
                                     ) {
-                                        Text(text = "Share via QR Code")
+                                        Text(text = "Share via QR Code " + isConnected)
                                     }
                                 }
                             }
