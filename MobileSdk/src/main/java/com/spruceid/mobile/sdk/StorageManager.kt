@@ -12,7 +12,7 @@ private class DataStoreSingleton private constructor(context: Context) {
     val dataStore: DataStore<Preferences> = store(context, "default")
 
     companion object {
-        private const val FILENAME_PREFIX = "datastore_"
+        private const val FILENAME_PREFIX = "sprucekit/datastore/"
 
         private fun location(context: Context, file: String) =
             context.preferencesDataStoreFile(FILENAME_PREFIX + file.lowercase())
@@ -24,14 +24,18 @@ private class DataStoreSingleton private constructor(context: Context) {
         private var instance: DataStoreSingleton? = null
 
         fun getInstance(context: Context) =
-            instance ?: synchronized(this) {
-                instance ?: DataStoreSingleton(context).also { instance = it }
-            }
+            instance
+                ?: synchronized(this) {
+                    instance ?: DataStoreSingleton(context).also {
+                        instance = it
+                    }
+                }
     }
 }
 
 object StorageManager {
-    private val flags = Base64.URL_SAFE xor Base64.NO_PADDING xor Base64.NO_WRAP
+    private const val B64_FLAGS = Base64.URL_SAFE or Base64.NO_PADDING or Base64.NO_WRAP
+    private const val KEY_NAME = "sprucekit/datastore"
 
     /// Function: encrypt
     ///
@@ -42,12 +46,12 @@ object StorageManager {
     private fun encrypt(value: String): Result<ByteArray> {
         val keyManager = KeyManager()
         try {
-            if (!keyManager.keyExists("datastore")) {
-                keyManager.generateEncryptionKey("datastore")
+            if (!keyManager.keyExists(KEY_NAME)) {
+                keyManager.generateEncryptionKey(KEY_NAME)
             }
-            val encrypted = keyManager.encryptPayload("datastore", value.toByteArray())
-            val iv = Base64.encodeToString(encrypted.first, flags)
-            val bytes = Base64.encodeToString(encrypted.second, flags)
+            val encrypted = keyManager.encryptPayload(KEY_NAME, value.toByteArray())
+            val iv = Base64.encodeToString(encrypted.first, B64_FLAGS)
+            val bytes = Base64.encodeToString(encrypted.second, B64_FLAGS)
             val res = "$iv;$bytes".toByteArray()
             return Result.success(res)
         } catch (e: Exception) {
@@ -64,15 +68,16 @@ object StorageManager {
     private fun decrypt(value: ByteArray): Result<String> {
         val keyManager = KeyManager()
         try {
-            if (!keyManager.keyExists("datastore")) {
+            if (!keyManager.keyExists(KEY_NAME)) {
                 return Result.failure(Exception("Cannot retrieve values before creating encryption keys"))
             }
             val decoded = value.decodeToString().split(";")
             assert(decoded.size == 2)
-            val iv = Base64.decode(decoded.first(), flags)
-            val encrypted = Base64.decode(decoded.last(), flags)
-            val decrypted = keyManager.decryptPayload("datastore", iv, encrypted)
-                ?: return Result.failure(Exception("Failed to decrypt value"))
+            val iv = Base64.decode(decoded.first(), B64_FLAGS)
+            val encrypted = Base64.decode(decoded.last(), B64_FLAGS)
+            val decrypted =
+                keyManager.decryptPayload(KEY_NAME, iv, encrypted)
+                    ?: return Result.failure(Exception("Failed to decrypt value"))
             return Result.success(decrypted.decodeToString())
         } catch (e: Exception) {
             return Result.failure(e)
@@ -112,22 +117,26 @@ object StorageManager {
     /// key - The key to retrieve
     suspend fun get(context: Context, key: String): Result<String?> {
         val storeKey = byteArrayPreferencesKey(key)
-        return DataStoreSingleton.getInstance(context).dataStore.data.map { store ->
-            try {
-                store[storeKey]?.let { v ->
-                    val storeValue = decrypt(v)
-                    when {
-                        storeValue.isSuccess -> Result.success(storeValue.getOrThrow())
-                        storeValue.isFailure -> Result.failure(storeValue.exceptionOrNull()!!)
-                        else -> Result.failure(Exception("Failed to decrypt value for storage"))
+        return DataStoreSingleton.getInstance(context)
+            .dataStore
+            .data
+            .map { store ->
+                try {
+                    store[storeKey]?.let { v ->
+                        val storeValue = decrypt(v)
+                        when {
+                            storeValue.isSuccess -> Result.success(storeValue.getOrThrow())
+                            storeValue.isFailure -> Result.failure(storeValue.exceptionOrNull()!!)
+                            else -> Result.failure(Exception("Failed to decrypt value for storage"))
+                        }
                     }
-                } ?: Result.success(null)
-            } catch (e: Exception) {
-                Result.failure(e)
+                        ?: Result.success(null)
+                } catch (e: Exception) {
+                    Result.failure(e)
+                }
             }
-        }.catch { exception ->
-            emit(Result.failure(exception))
-        }.first()
+            .catch { exception -> emit(Result.failure(exception)) }
+            .first()
     }
 
     /// Function: remove
