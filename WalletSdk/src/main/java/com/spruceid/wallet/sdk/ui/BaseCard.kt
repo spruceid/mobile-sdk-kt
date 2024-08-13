@@ -1,8 +1,10 @@
 package com.spruceid.wallet.sdk.ui
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -100,7 +102,9 @@ fun CardListView(
     val titleValues = credentialPack.get(rendering.titleKeys)
     val descriptionValues = credentialPack.get(rendering.descriptionKeys ?: emptyList())
 
-    Row {
+    Row(
+        Modifier.height(intrinsicSize = IntrinsicSize.Max)
+    ) {
         // Leading icon
         if(rendering.leadingIconFormatter != null) {
             rendering.leadingIconFormatter.invoke(
@@ -112,6 +116,7 @@ fun CardListView(
             // Title
             if(rendering.titleFormatter != null) {
                 rendering.titleFormatter.invoke(titleValues)
+//                verifyJwtVp
             } else {
                 Text(text = titleValues.values
                     .fold(emptyList<String>()) { acc, next -> acc + next.values

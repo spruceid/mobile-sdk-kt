@@ -2,13 +2,13 @@ package com.spruceid.wallet.sdk
 
 import android.bluetooth.BluetoothManager
 import android.util.Log
-import com.spruceid.wallet.sdk.rs.ItemsRequest
-import com.spruceid.wallet.sdk.rs.SessionManager
-import com.spruceid.wallet.sdk.rs.SessionManagerEngaged
-import com.spruceid.wallet.sdk.rs.initialiseSession
-import com.spruceid.wallet.sdk.rs.handleRequest
-import com.spruceid.wallet.sdk.rs.submitResponse
-import com.spruceid.wallet.sdk.rs.submitSignature
+import com.spruceid.mobile.sdk.rs.ItemsRequest
+import com.spruceid.mobile.sdk.rs.SessionManager
+import com.spruceid.mobile.sdk.rs.SessionManagerEngaged
+import com.spruceid.mobile.sdk.rs.initialiseSession
+import com.spruceid.mobile.sdk.rs.handleRequest
+import com.spruceid.mobile.sdk.rs.submitResponse
+import com.spruceid.mobile.sdk.rs.submitSignature
 import java.security.KeyStore
 import java.security.Signature
 import java.util.UUID

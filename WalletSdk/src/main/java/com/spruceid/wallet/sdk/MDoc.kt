@@ -1,7 +1,7 @@
 package com.spruceid.wallet.sdk
 
 import android.util.Log
-import com.spruceid.wallet.sdk.rs.MDoc as InnerMDoc
+import com.spruceid.mobile.sdk.rs.MDoc as InnerMDoc
 
 class MDoc(id: String, issuerAuth: ByteArray, val keyAlias: String) : BaseCredential(id) {
      val inner: InnerMDoc
