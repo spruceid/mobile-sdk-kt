@@ -72,7 +72,6 @@ fun MRZScanner(
         onCancel = onCancel,
         fontFamily = fontFamily,
         textColor = textColor,
-//        https://blog.stackademic.com/real-time-text-detection-with-camerax-mlkit-and-jetpack-compose-on-android-5037f9f5b050
         imageAnalyzer = MlKitAnalyzer(
             listOf(textRecognizer),
             COORDINATE_SYSTEM_ORIGINAL,
