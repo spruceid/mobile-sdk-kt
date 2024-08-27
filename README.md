@@ -33,3 +33,7 @@ called in native SDKs.
 - [Kotlin SDK](https://github.com/spruceid/mobile-sdk-kt)
 - [Swift SDK](https://github.com/spruceid/mobile-sdk-swift)
 - [Rust layer](https://github.com/spruceid/mobile-sdk-rs)
+
+## Configuring Deep Links for same device flows
+
+Click [here](./MobileSdk/src/main/java/com/spruceid/mobile/sdk/ui/SameDeviceOID4VP.md) to see how to configure the same device OpenID4VP flow.
