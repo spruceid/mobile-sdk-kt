@@ -116,7 +116,6 @@ fun CardListView(
             // Title
             if(rendering.titleFormatter != null) {
                 rendering.titleFormatter.invoke(titleValues)
-//                verifyJwtVp
             } else {
                 Text(text = titleValues.values
                     .fold(emptyList<String>()) { acc, next -> acc + next.values
