@@ -1,9 +1,7 @@
 package com.spruceid.mobile.sdk.ui
 
-import android.graphics.ImageFormat
-import android.os.Build
-import androidx.camera.core.ImageAnalysis
-import androidx.camera.core.ImageProxy
+import androidx.camera.core.ImageAnalysis.COORDINATE_SYSTEM_ORIGINAL
+import androidx.camera.mlkit.vision.MlKitAnalyzer
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -28,18 +26,15 @@ import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
-import com.google.zxing.BinaryBitmap
-import com.google.zxing.DecodeHintType
-import com.google.zxing.PlanarYUVLuminanceSource
-import com.google.zxing.common.HybridBinarizer
-import com.google.zxing.qrcode.QRCodeReader
-import java.nio.ByteBuffer
-import java.util.EnumMap
+import androidx.core.content.ContextCompat
+import com.google.mlkit.vision.text.TextRecognition
+import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 
 @Composable
-fun QRCodeScanner(
+fun MRZScanner(
     title: String = "Scan QR Code",
     subtitle: String = "Please align within the guides",
     cancelButtonLabel: String = "Cancel",
@@ -53,6 +48,23 @@ fun QRCodeScanner(
     backgroundOpacity: Float = 0.5f,
 ) {
 
+    val textRecognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
+    val firstLineRegex = Regex(
+        pattern = "IAUT[O0]\\d{10}SRC\\d{10}<<",
+    )
+    val secondLineRegex = Regex(
+        pattern = "([0-9]{7}[MF<][0-9]{7}[A-Z<]{3}[A-Z0-9<]{11}[0-9])",
+    )
+    val thirdLineRegex = Regex(
+        pattern = "([A-Z]+<)+<([A-Z]+<)+<+",
+    )
+
+    var firstLine by remember { mutableStateOf<String?>(null) }
+    var secondLine by remember { mutableStateOf<String?>(null) }
+    var thirdLine by remember { mutableStateOf<String?>(null) }
+
+    val context = LocalContext.current
+
     GenericCameraXScanner(
         title = title,
         subtitle = subtitle,
@@ -60,13 +72,48 @@ fun QRCodeScanner(
         onCancel = onCancel,
         fontFamily = fontFamily,
         textColor = textColor,
-        imageAnalyzer =  QrCodeAnalyzer(
-            isMatch = isMatch,
-            onQrCodeScanned = { result ->
-                onRead(result)
-            }),
+        imageAnalyzer = MlKitAnalyzer(
+            listOf(textRecognizer),
+            COORDINATE_SYSTEM_ORIGINAL,
+            ContextCompat.getMainExecutor(context)
+        ) { analyzerResult ->
+            analyzerResult.getValue(textRecognizer)?.let { text ->
+                text.textBlocks
+                    .flatMap { textBlock -> textBlock.lines }
+                    .mapNotNull { lines ->
+                        lines.takeIf { firstLineRegex.matches(it.text)  }?.let {
+                            if(it.text.length == 30) {
+                                firstLine = it.text
+                            }
+                        }
+                        lines.takeIf { secondLineRegex.matches(it.text)  }?.let {
+                            if(it.text.length == 30) {
+                                secondLine = it.text
+                            }
+                        }
+                        lines.takeIf { thirdLineRegex.matches(it.text)  }?.let {
+                            if(it.text.length == 30) {
+                                thirdLine = it.text
+                            }
+                        }
+                    }
+
+                if(
+                    firstLine != null && secondLine != null && thirdLine != null) {
+                    val mrz = """$firstLine
+                        |$secondLine
+                        |$thirdLine""".trimMargin()
+                    if(isMatch(mrz)) {
+                        onRead(mrz)
+                    }
+                    firstLine = null
+                    secondLine = null
+                    thirdLine = null
+                }
+            }
+        },
         background = {
-            QRCodeScannerBackground(
+            MRZScannerBackground(
                 guidesColor = guidesColor,
                 readerColor = readerColor,
                 backgroundOpacity = backgroundOpacity,
@@ -76,7 +123,7 @@ fun QRCodeScanner(
 }
 
 @Composable
-fun QRCodeScannerBackground(
+fun MRZScannerBackground(
     guidesColor: Color = Color.White,
     readerColor: Color = Color.White,
     backgroundOpacity: Float = 0.5f,
@@ -105,18 +152,20 @@ fun QRCodeScannerBackground(
                 val canvasWidth = size.width
                 val canvasHeight = size.height
                 val width = canvasWidth * .6f
+                val height = canvasHeight * .6f
+
 
                 val left = (canvasWidth - width) / 2
-                val top = canvasHeight * .35f
+                val top = (canvasHeight - height) / 2
                 val right = left + width
-                val bottom = top + width
+                val bottom = top + height
                 val cornerLength = 40f
                 val cornerRadius = 40f
                 drawContent()
                 drawRect(Color(0x99000000))
                 drawRoundRect(
                     topLeft = Offset(left, top),
-                    size = Size(width, width),
+                    size = Size(width, height),
                     color = Color.Transparent,
                     blendMode = BlendMode.SrcIn,
                     cornerRadius = CornerRadius(cornerRadius - 10f),
@@ -209,59 +258,4 @@ fun QRCodeScannerBackground(
                 )
             },
     )
-}
-
-class QrCodeAnalyzer(
-    private val onQrCodeScanned: (String) -> Unit,
-    private val isMatch: (content: String) -> Boolean = {_ -> true},
-) : ImageAnalysis.Analyzer {
-
-    private val supportedImageFormats = mutableListOf(ImageFormat.YUV_420_888)
-
-    init {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            supportedImageFormats.addAll(listOf(ImageFormat.YUV_422_888, ImageFormat.YUV_444_888))
-        }
-    }
-
-    override fun analyze(image: ImageProxy) {
-        if (image.format in supportedImageFormats) {
-            val bytes = image.planes[0].buffer.toByteArray()
-            val source =
-                PlanarYUVLuminanceSource(
-                    bytes,
-                    image.width,
-                    image.height,
-                    0,
-                    0,
-                    image.width,
-                    image.height,
-                    false,
-                )
-            val binaryBmp = BinaryBitmap(HybridBinarizer(source))
-
-            val hints: MutableMap<DecodeHintType, Any?> = EnumMap(
-                DecodeHintType::class.java
-            )
-
-            hints[DecodeHintType.TRY_HARDER] = true
-            try {
-                val result = QRCodeReader().decode(binaryBmp, hints)
-                if (isMatch(result.text)) {
-                    onQrCodeScanned(result.text)
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
-            } finally {
-                image.close()
-            }
-        }
-    }
-
-    private fun ByteBuffer.toByteArray(): ByteArray {
-        rewind()
-        return ByteArray(remaining()).also {
-            get(it)
-        }
-    }
 }

@@ -34,12 +34,12 @@ import com.google.zxing.BinaryBitmap
 import com.google.zxing.DecodeHintType
 import com.google.zxing.PlanarYUVLuminanceSource
 import com.google.zxing.common.HybridBinarizer
-import com.google.zxing.qrcode.QRCodeReader
+import com.google.zxing.pdf417.PDF417Reader
 import java.nio.ByteBuffer
 import java.util.EnumMap
 
 @Composable
-fun QRCodeScanner(
+fun PDF417Scanner(
     title: String = "Scan QR Code",
     subtitle: String = "Please align within the guides",
     cancelButtonLabel: String = "Cancel",
@@ -60,13 +60,13 @@ fun QRCodeScanner(
         onCancel = onCancel,
         fontFamily = fontFamily,
         textColor = textColor,
-        imageAnalyzer =  QrCodeAnalyzer(
+        imageAnalyzer =  PDF417Analyzer(
             isMatch = isMatch,
             onQrCodeScanned = { result ->
                 onRead(result)
             }),
         background = {
-            QRCodeScannerBackground(
+            PDF417ScannerBackground(
                 guidesColor = guidesColor,
                 readerColor = readerColor,
                 backgroundOpacity = backgroundOpacity,
@@ -75,8 +75,64 @@ fun QRCodeScanner(
     )
 }
 
+class PDF417Analyzer(
+    private val onQrCodeScanned: (String) -> Unit,
+    private val isMatch: (content: String) -> Boolean = {_ -> true},
+) : ImageAnalysis.Analyzer {
+
+    private val supportedImageFormats = mutableListOf(ImageFormat.YUV_420_888)
+
+    init {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            supportedImageFormats.addAll(listOf(ImageFormat.YUV_422_888, ImageFormat.YUV_444_888))
+        }
+    }
+
+    override fun analyze(image: ImageProxy) {
+        if (image.format in supportedImageFormats) {
+            val bytes = image.planes[0].buffer.toByteArray()
+            val source =
+                PlanarYUVLuminanceSource(
+                    bytes,
+                    image.width,
+                    image.height,
+                    0,
+                    0,
+                    image.width,
+                    image.height,
+                    false,
+                )
+            val binaryBmp = BinaryBitmap(HybridBinarizer(source))
+
+            val hints: MutableMap<DecodeHintType, Any?> = EnumMap(
+                DecodeHintType::class.java
+            )
+
+            hints[DecodeHintType.TRY_HARDER] = true
+
+            try {
+                val result = PDF417Reader().decode(binaryBmp, hints)
+                if (isMatch(result.text)) {
+                    onQrCodeScanned(result.text)
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            } finally {
+                image.close()
+            }
+        }
+    }
+
+    private fun ByteBuffer.toByteArray(): ByteArray {
+        rewind()
+        return ByteArray(remaining()).also {
+            get(it)
+        }
+    }
+}
+
 @Composable
-fun QRCodeScannerBackground(
+fun PDF417ScannerBackground(
     guidesColor: Color = Color.White,
     readerColor: Color = Color.White,
     backgroundOpacity: Float = 0.5f,
@@ -105,18 +161,20 @@ fun QRCodeScannerBackground(
                 val canvasWidth = size.width
                 val canvasHeight = size.height
                 val width = canvasWidth * .6f
+                val height = canvasHeight * .6f
+
 
                 val left = (canvasWidth - width) / 2
-                val top = canvasHeight * .35f
+                val top = (canvasHeight - height) / 2
                 val right = left + width
-                val bottom = top + width
+                val bottom = top + height
                 val cornerLength = 40f
                 val cornerRadius = 40f
                 drawContent()
                 drawRect(Color(0x99000000))
                 drawRoundRect(
                     topLeft = Offset(left, top),
-                    size = Size(width, width),
+                    size = Size(width, height),
                     color = Color.Transparent,
                     blendMode = BlendMode.SrcIn,
                     cornerRadius = CornerRadius(cornerRadius - 10f),
@@ -209,59 +267,4 @@ fun QRCodeScannerBackground(
                 )
             },
     )
-}
-
-class QrCodeAnalyzer(
-    private val onQrCodeScanned: (String) -> Unit,
-    private val isMatch: (content: String) -> Boolean = {_ -> true},
-) : ImageAnalysis.Analyzer {
-
-    private val supportedImageFormats = mutableListOf(ImageFormat.YUV_420_888)
-
-    init {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            supportedImageFormats.addAll(listOf(ImageFormat.YUV_422_888, ImageFormat.YUV_444_888))
-        }
-    }
-
-    override fun analyze(image: ImageProxy) {
-        if (image.format in supportedImageFormats) {
-            val bytes = image.planes[0].buffer.toByteArray()
-            val source =
-                PlanarYUVLuminanceSource(
-                    bytes,
-                    image.width,
-                    image.height,
-                    0,
-                    0,
-                    image.width,
-                    image.height,
-                    false,
-                )
-            val binaryBmp = BinaryBitmap(HybridBinarizer(source))
-
-            val hints: MutableMap<DecodeHintType, Any?> = EnumMap(
-                DecodeHintType::class.java
-            )
-
-            hints[DecodeHintType.TRY_HARDER] = true
-            try {
-                val result = QRCodeReader().decode(binaryBmp, hints)
-                if (isMatch(result.text)) {
-                    onQrCodeScanned(result.text)
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
-            } finally {
-                image.close()
-            }
-        }
-    }
-
-    private fun ByteBuffer.toByteArray(): ByteArray {
-        rewind()
-        return ByteArray(remaining()).also {
-            get(it)
-        }
-    }
 }
