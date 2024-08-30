@@ -3,12 +3,9 @@ package com.spruceid.mobile.sdk
 import android.bluetooth.BluetoothManager
 import android.util.Log
 import androidx.lifecycle.ViewModel
-import com.spruceid.mobile.sdk.rs.RequestData
-import com.spruceid.mobile.sdk.rs.SessionData
-import com.spruceid.mobile.sdk.rs.handleRequest
-import com.spruceid.mobile.sdk.rs.initialiseSession
-import com.spruceid.mobile.sdk.rs.submitResponse
-import com.spruceid.mobile.sdk.rs.submitSignature
+import com.spruceid.mobile.sdk.rs.ItemsRequest
+import com.spruceid.mobile.sdk.rs.MdlPresentationSession
+import com.spruceid.mobile.sdk.rs.Wallet
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import java.security.KeyStore
@@ -23,10 +20,10 @@ class CredentialsViewModel : ViewModel() {
     private val _currState = MutableStateFlow(PresentmentState.UNINITIALIZED)
     val currState = _currState.asStateFlow()
 
-    private val _requestData = MutableStateFlow<RequestData?>(null)
+    private val _requestData = MutableStateFlow<List<ItemsRequest>?>(null)
     val requestData = _requestData.asStateFlow()
 
-    private val _session = MutableStateFlow<SessionData?>(null)
+    private val _session = MutableStateFlow<MdlPresentationSession?>(null)
     val session = _session.asStateFlow()
 
     private val _allowedNamespaces =
@@ -65,21 +62,21 @@ class CredentialsViewModel : ViewModel() {
     }
 
     private fun updateRequestData(data: ByteArray) {
-        _requestData.value = handleRequest(_session.value!!.state, data)
+        _requestData.value = _session.value!!.handleRequest(data)
         val namespaces =
-            requestData.value!!.itemsRequests.map { itemsRequest -> itemsRequest.namespaces }
+            requestData.value!!.map { itemsRequest -> itemsRequest.namespaces }
         Log.d(
             "CredentialsViewModel.updateRequestData",
-            "Updating requestData: \nitemRequests ${requestData.value!!.itemsRequests.map { itemsRequest -> itemsRequest.docType }} namespaces: $namespaces"
+            "Updating requestData: \nitemRequests ${requestData.value!!.map { itemsRequest -> itemsRequest.docType }} namespaces: $namespaces"
         )
         _currState.value = PresentmentState.SELECT_NAMESPACES
     }
 
-    fun present(bluetoothManager: BluetoothManager) {
+    fun present(bluetoothManager: BluetoothManager, wallet: Wallet) {
         Log.d("CredentialsViewModel.present", "Credentials: ${_credentials.value}")
         _uuid.value = UUID.randomUUID()
         val first: MDoc = _credentials.value.first() as MDoc
-        _session.value = initialiseSession(first.inner, _uuid.value.toString())
+        _session.value = wallet.initializeMdlPresentation(first.inner, _uuid.value.toString())
         _currState.value = PresentmentState.ENGAGING_QR_CODE
         _transport.value = Transport(bluetoothManager)
         _transport.value!!

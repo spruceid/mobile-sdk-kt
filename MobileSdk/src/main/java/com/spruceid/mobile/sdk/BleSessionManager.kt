@@ -3,12 +3,11 @@ package com.spruceid.mobile.sdk
 import android.bluetooth.BluetoothManager
 import android.util.Log
 import com.spruceid.mobile.sdk.rs.ItemsRequest
-import com.spruceid.mobile.sdk.rs.SessionManager
-import com.spruceid.mobile.sdk.rs.SessionManagerEngaged
-import com.spruceid.mobile.sdk.rs.initialiseSession
-import com.spruceid.mobile.sdk.rs.handleRequest
-import com.spruceid.mobile.sdk.rs.submitResponse
-import com.spruceid.mobile.sdk.rs.submitSignature
+import com.spruceid.mobile.sdk.rs.Key
+import com.spruceid.mobile.sdk.rs.KeyManagerInterface
+import com.spruceid.mobile.sdk.rs.MdlPresentationSession
+import com.spruceid.mobile.sdk.rs.StorageManagerInterface
+import com.spruceid.mobile.sdk.rs.Wallet
 import java.security.KeyStore
 import java.security.Signature
 import java.util.UUID
@@ -21,23 +20,21 @@ public class BLESessionManager {
 
     val callback: BLESessionStateDelegate
     val uuid: UUID
-    var state: SessionManagerEngaged? = null
-    var sessionManager: SessionManager? = null
     var itemsRequests: List<ItemsRequest> = listOf()
-    val mdoc: MDoc
     var bleManager: Transport? = null
+    var session: MdlPresentationSession? = null
 
     constructor(
         mdoc: MDoc,
         bluetoothManager: BluetoothManager,
         callback: BLESessionStateDelegate,
+        wallet: Wallet,
+        mdocId: String,
     ) {
         this.callback = callback
         this.uuid = UUID.randomUUID()
-        this.mdoc = mdoc
         try {
-            val sessionData = initialiseSession(mdoc.inner, uuid.toString())
-            this.state = sessionData.state
+            this.session = wallet.initializeMdlPresentation(mdocId, uuid.toString())
             this.bleManager = Transport(bluetoothManager)
             this.bleManager!!
                 .initialize(
@@ -45,11 +42,11 @@ public class BLESessionManager {
                     this.uuid,
                     "BLE",
                     "Central",
-                    sessionData.bleIdent.toByteArray(),
+                    session!!.getBleIdent(),
                     ::updateRequestData,
                     callback
                 )
-            this.callback.update(mapOf(Pair("engagingQRCode", sessionData.qrCodeUri)))
+            this.callback.update(mapOf(Pair("engagingQRCode", session!!.getQrCodeUri())))
         } catch (e: Error) {
             Log.e("BleSessionManager.constructor", e.toString())
         }
@@ -59,33 +56,12 @@ public class BLESessionManager {
         this.bleManager?.terminate()
     }
 
-    fun submitNamespaces(items: Map<String, Map<String, List<String>>>) {
-        val payload = submitResponse(
-            this.sessionManager!!,
-            items
-        )
-
-        val ks: KeyStore = KeyStore.getInstance(
-            "AndroidKeyStore"
-        )
-
-        ks.load(
-            null
-        )
-
-        val entry = ks.getEntry(this.mdoc.keyAlias, null)
-        if (entry !is KeyStore.PrivateKeyEntry) {
-            throw IllegalStateException("No such private key under the alias <${this.mdoc.keyAlias}>")
-        }
-
+    fun submitNamespaces(items: Map<String, Map<String, List<String>>>, keyid: Key) {
         try {
-            val signer = Signature.getInstance("SHA256withECDSA")
-            signer.initSign(entry.privateKey)
-
-            signer.update(payload)
-
-            val signature = signer.sign()
-            val response = submitSignature(this.sessionManager!!, signature)
+            val response = session!!.submitResponse(
+                items,
+                keyid
+        )
             this.bleManager!!.send(response)
         } catch (e: Error) {
             Log.e("CredentialsViewModel.submitNamespaces", e.toString())
@@ -95,9 +71,8 @@ public class BLESessionManager {
     }
 
     fun updateRequestData(data: ByteArray) {
-        val requestData = handleRequest(this.state!!, data)
-        this.sessionManager = requestData.sessionManager
-        this.itemsRequests = requestData.itemsRequests
-        this.callback.update(mapOf(Pair("selectNamespaces", requestData.itemsRequests)))
+        val itemsRequests = session!!.handleRequest(data)
+        this.itemsRequests = itemsRequests
+        this.callback.update(mapOf(Pair("selectNamespaces", itemsRequests)))
     }
 }
