@@ -263,7 +263,7 @@ class GattClient(private var callback: GattClientCallback,
                     // Finally we've set everything up, we can write 0x01 to state to signal
                     // to the other end (mDL reader) that it can start sending data to us..
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                        val res = gatt.writeCharacteristic(characteristicState!!, byteArrayOf(0x01.toByte()), BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT)
+                        val res = gatt.writeCharacteristic(characteristicState!!, byteArrayOf(0x01.toByte()), BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE)
                         if(res != BluetoothStatusCodes.SUCCESS) {
                             callback.onError(Error("Error writing to Server2Client. Code: $res"))
                             return
@@ -451,7 +451,7 @@ class GattClient(private var callback: GattClientCallback,
 
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                val res = gattClient!!.writeCharacteristic(characteristicClient2Server!!, chunk, BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT)
+                val res = gattClient!!.writeCharacteristic(characteristicClient2Server!!, chunk, BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE)
                 if(res != BluetoothStatusCodes.SUCCESS) {
                     callback.onError(Error("Error writing to Server2Client. Code: $res"))
                     return
@@ -545,7 +545,7 @@ class GattClient(private var callback: GattClientCallback,
         val terminationCode = byteArrayOf(0x02.toByte())
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                val res = gattClient!!.writeCharacteristic(characteristicState!!, terminationCode, BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT)
+                val res = gattClient!!.writeCharacteristic(characteristicState!!, terminationCode, BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE)
                 if(res != BluetoothStatusCodes.SUCCESS) {
                     callback.onError(Error("Error writing to state characteristic. Code: $res"))
                     return
