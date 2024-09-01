@@ -3,7 +3,11 @@ import android.util.Base64
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.*
 import androidx.datastore.preferences.preferencesDataStoreFile
-import com.spruceid.wallet.sdk.KeyManager
+import com.spruceid.mobile.sdk.KeyManager
+import com.spruceid.mobile.sdk.rs.Key
+import com.spruceid.mobile.sdk.rs.StorageManagerException
+import com.spruceid.mobile.sdk.rs.StorageManagerInterface
+import com.spruceid.mobile.sdk.rs.Value
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -33,9 +37,8 @@ private class DataStoreSingleton private constructor(context: Context) {
     }
 }
 
-object StorageManager {
-    private const val B64_FLAGS = Base64.URL_SAFE or Base64.NO_PADDING or Base64.NO_WRAP
-    private const val KEY_NAME = "sprucekit/datastore"
+class StorageManager(context: Context) : StorageManagerInterface {
+    private lateinit var context: Context
 
     /// Function: encrypt
     ///
@@ -43,13 +46,13 @@ object StorageManager {
     ///
     /// Arguments:
     /// value - The string value to be encrypted
-    private fun encrypt(value: String): Result<ByteArray> {
+    private fun encrypt(value: Value): Result<ByteArray> {
         val keyManager = KeyManager()
         try {
             if (!keyManager.keyExists(KEY_NAME)) {
                 keyManager.generateEncryptionKey(KEY_NAME)
             }
-            val encrypted = keyManager.encryptPayload(KEY_NAME, value.toByteArray())
+            val encrypted = keyManager.encryptPayload(KEY_NAME, value)
             val iv = Base64.encodeToString(encrypted.first, B64_FLAGS)
             val bytes = Base64.encodeToString(encrypted.second, B64_FLAGS)
             val res = "$iv;$bytes".toByteArray()
@@ -93,19 +96,22 @@ object StorageManager {
     /// context - The application context to be able to access the DataStore
     /// key - The key to add
     /// value - The value to add under the key
-    suspend fun add(context: Context, key: String, value: String): Result<Unit> {
+    override suspend fun add(key: Key, value: Value) {
         val storeKey = byteArrayPreferencesKey(key)
         val storeValue = encrypt(value)
 
         if (storeValue.isFailure) {
-            return Result.failure(Exception("Failed to encrypt value for storage"))
+             throw StorageManagerException.InternalException()
         }
 
-        DataStoreSingleton.getInstance(context).dataStore.edit { store ->
+        DataStoreSingleton.getInstance(this.context).dataStore.edit { store ->
             store[storeKey] = storeValue.getOrThrow()
         }
+    }
 
-        return Result.success(Unit)
+    override suspend fun list(): List<Key> {
+        val keys = DataStoreSingleton.getInstance(context).dataStore.data.map { store -> store.asMap().keys.toList() }.first()
+        return keys.map { key -> key.name }
     }
 
     /// Function: get
@@ -115,7 +121,7 @@ object StorageManager {
     /// Arguments:
     /// context - The application context to be able to access the DataStore
     /// key - The key to retrieve
-    suspend fun get(context: Context, key: String): Result<String?> {
+    override suspend fun get(key: Key): Value? {
         val storeKey = byteArrayPreferencesKey(key)
         return DataStoreSingleton.getInstance(context)
             .dataStore
@@ -125,18 +131,18 @@ object StorageManager {
                     store[storeKey]?.let { v ->
                         val storeValue = decrypt(v)
                         when {
-                            storeValue.isSuccess -> Result.success(storeValue.getOrThrow())
-                            storeValue.isFailure -> Result.failure(storeValue.exceptionOrNull()!!)
-                            else -> Result.failure(Exception("Failed to decrypt value for storage"))
+                            storeValue.isSuccess -> storeValue.getOrThrow()
+                            storeValue.isFailure -> throw StorageManagerException.CouldNotDecryptValue()
+                            else -> throw StorageManagerException.CouldNotDecryptValue()
                         }
                     }
-                        ?: Result.success(null)
                 } catch (e: Exception) {
-                    Result.failure(e)
+                    throw StorageManagerException.InvalidLookupKey()
                 }
             }
-            .catch { exception -> emit(Result.failure(exception)) }
+            .catch { exception -> throw exception }
             .first()
+            ?.toByteArray()
     }
 
     /// Function: remove
@@ -146,13 +152,17 @@ object StorageManager {
     /// Arguments:
     /// context - The application context to be able to access the DataStore
     /// key - The key to remove
-    suspend fun remove(context: Context, key: String): Result<Unit> {
+    override suspend fun remove(key: Key) {
         val storeKey = stringPreferencesKey(key)
         DataStoreSingleton.getInstance(context).dataStore.edit { store ->
             if (store.contains(storeKey)) {
                 store.remove(storeKey)
             }
         }
-        return Result.success(Unit)
+    }
+
+    companion object {
+        private const val B64_FLAGS = Base64.URL_SAFE or Base64.NO_PADDING or Base64.NO_WRAP
+        private const val KEY_NAME = "sprucekit/datastore"
     }
 }
