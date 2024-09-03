@@ -16,23 +16,17 @@ abstract class BLESessionStateDelegate {
     abstract fun update(state: Map<String, Any>)
 }
 
-public class BLESessionManager {
+public class BLESessionManager(val callback: BLESessionStateDelegate) {
 
-    val callback: BLESessionStateDelegate
-    val uuid: UUID
-    var itemsRequests: List<ItemsRequest> = listOf()
-    var bleManager: Transport? = null
-    var session: MdlPresentationSession? = null
+    val uuid: UUID = UUID.randomUUID()
+    private var itemsRequests: List<ItemsRequest> = listOf()
+    private var bleManager: Transport? = null
+    private var session: MdlPresentationSession? = null
 
-    constructor(
-        mdoc: MDoc,
-        bluetoothManager: BluetoothManager,
-        callback: BLESessionStateDelegate,
-        wallet: Wallet,
+    suspend fun initialize(
+        bluetoothManager: BluetoothManager, wallet: Wallet,
         mdocId: String,
     ) {
-        this.callback = callback
-        this.uuid = UUID.randomUUID()
         try {
             this.session = wallet.initializeMdlPresentation(mdocId, uuid.toString())
             this.bleManager = Transport(bluetoothManager)

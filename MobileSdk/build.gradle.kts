@@ -118,7 +118,7 @@ android {
 }
 
 dependencies {
-    api("com.spruceid.mobile.sdk.rs:mobilesdkrs:0.0.28")
+    api(files("/home/ross/External/spruceid/mobile-sdk-rs/kotlin/mobilesdkrs/build/outputs/aar/mobilesdkrs-debug.aar"))
     //noinspection GradleCompatible
     implementation("com.android.support:appcompat-v7:28.0.0")
     /* Begin UI dependencies */
@@ -126,6 +126,7 @@ dependencies {
     implementation("androidx.camera:camera-camera2:1.3.2")
     implementation("androidx.camera:camera-lifecycle:1.3.2")
     implementation("androidx.camera:camera-view:1.3.2")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.4")
     implementation("com.google.zxing:core:3.5.1")
     implementation("com.google.accompanist:accompanist-permissions:0.34.0")
     implementation("androidx.camera:camera-mlkit-vision:1.3.0-alpha06")
