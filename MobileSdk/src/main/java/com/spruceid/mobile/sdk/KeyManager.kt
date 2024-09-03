@@ -6,6 +6,10 @@ import android.security.keystore.KeyProperties
 import android.util.Base64
 import android.util.Log
 import androidx.annotation.RequiresApi
+import com.spruceid.mobile.sdk.rs.EncryptedPayload
+import com.spruceid.mobile.sdk.rs.Key
+import com.spruceid.mobile.sdk.rs.KeyManagerException
+import com.spruceid.mobile.sdk.rs.KeyManagerInterface
 import java.security.KeyPairGenerator
 import java.security.KeyStore
 import java.security.Signature
@@ -19,7 +23,7 @@ import javax.crypto.spec.GCMParameterSpec
 /**
  * Implementation of the secure key management with Strongbox and TEE as backup.
  */
-class KeyManager {
+class KeyManager: KeyManagerInterface {
 
     /**
      * Returns the Android Keystore.
@@ -51,11 +55,13 @@ class KeyManager {
     /**
      * Resets the Keystore by removing all of the keys.
      */
-    fun reset() {
+    override fun reset(): Boolean {
         val ks = getKeyStore()
         ks.aliases().iterator().forEach {
             ks.deleteEntry(it)
         }
+
+        return true
     }
 
     /**
@@ -64,21 +70,21 @@ class KeyManager {
      * @property id of the secret key.
      * @returns KeyManagerEnvironment indicating the environment used to generate the key.
      */
-    fun generateSigningKey(id: String): KeyManagerEnvironment {
+    override fun generateSigningKey(id: Key): Boolean {
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
                 generateSigningKeyWithStrongbox(id)
 
-                return KeyManagerEnvironment.Strongbox
+                return true
             } else {
                 generateSigningKeyTEE(id)
 
-                return KeyManagerEnvironment.TEE
+                return true
             }
         } catch (e: Exception) {
             generateSigningKeyTEE(id)
 
-            return KeyManagerEnvironment.TEE
+            return true
         }
     }
 
@@ -152,7 +158,7 @@ class KeyManager {
      * @property id of the secret key.
      * @return the JWK as a string.
      */
-    fun getJwk(id: String): String? {
+    override fun getJwk(id: String): String {
         val ks = getKeyStore()
         val key = ks.getEntry(id, null)
     
@@ -176,7 +182,7 @@ class KeyManager {
             }
         }
     
-        return null
+        throw KeyManagerException.KeyNotFound()
     }
 
     /**
@@ -184,7 +190,7 @@ class KeyManager {
      * @property id of the secret key.
      * @return indication if the key exists.
      */
-    fun keyExists(id: String): Boolean {
+    override fun keyExists(id: String): Boolean {
         val ks = getKeyStore()
         return ks.containsAlias(id) && ks.isKeyEntry(id)
     }
@@ -195,14 +201,14 @@ class KeyManager {
      * @property payload to be signed.
      * @return the signed payload.
      */
-    fun signPayload(id: String, payload: ByteArray): ByteArray? {
+    override fun signPayload(id: String, payload: ByteArray): ByteArray {
         val ks = getKeyStore()
         val entry: KeyStore.Entry = ks.getEntry(id, null)
         if (entry !is KeyStore.PrivateKeyEntry) {
             Log.w("KEYMAN", "Not an instance of a PrivateKeyEntry")
-            return null
+            throw KeyManagerException.KeyInvalid()
         }
-    
+
         return Signature.getInstance("SHA256withECDSA").run {
             initSign(entry.privateKey)
             update(payload)
@@ -215,21 +221,21 @@ class KeyManager {
      * @property id of the secret key.
      * @returns KeyManagerEnvironment indicating the environment used to generate the key.
      */
-    fun generateEncryptionKey(id: String): KeyManagerEnvironment {
+    override fun generateEncryptionKey(id: String): Boolean {
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
                 generateEncryptionKeyWithStrongbox(id)
 
-                return KeyManagerEnvironment.Strongbox
+                return true
             } else {
                 generateEncryptionKeyWithTEE(id)
 
-                return KeyManagerEnvironment.TEE
+                return true
             }
         } catch (e: Exception) {
             generateEncryptionKeyWithTEE(id)
 
-            return KeyManagerEnvironment.TEE
+            return true
         }
     }
 
@@ -281,20 +287,21 @@ class KeyManager {
         generator.generateKey()
     }
 
+
     /**
      * Encrypts payload by a key referenced by key id.
      * @property id of the secret key.
      * @property payload to be encrypted.
      * @return initialization vector with the encrypted payload.
      */
-    fun encryptPayload(id: String, payload: ByteArray): Pair<ByteArray, ByteArray> {
+    override fun encryptPayload(id: String, payload: ByteArray): EncryptedPayload {
         val secretKey = getSecretKey(id)
     
         val cipher = Cipher.getInstance("AES/GCM/NoPadding")
         cipher.init(Cipher.ENCRYPT_MODE, secretKey)
         val iv = cipher.iv
         val encrypted = cipher.doFinal(payload)
-        return Pair(iv, encrypted)
+        return EncryptedPayload(iv, encrypted)
     }
 
     /**
@@ -304,11 +311,12 @@ class KeyManager {
      * @property payload to be encrypted.
      * @return the decrypted payload.
      */
-    fun decryptPayload(id: String, iv: ByteArray, payload: ByteArray): ByteArray? {
+    override fun decryptPayload(id: Key, encryptedPayload: EncryptedPayload): ByteArray {
         val secretKey = getSecretKey(id)
         val cipher = Cipher.getInstance("AES/GCM/NoPadding")
-        val spec = GCMParameterSpec(128, iv)
+        val spec = GCMParameterSpec(128, encryptedPayload.iv())
         cipher.init(Cipher.DECRYPT_MODE, secretKey, spec)
-        return cipher.doFinal(payload)
+        return cipher.doFinal(encryptedPayload.ciphertext())
     }
 }
+
