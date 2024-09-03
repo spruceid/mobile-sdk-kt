@@ -48,6 +48,13 @@ captures/
 .idea/libraries
 .idea/caches
 
+example/.idea/workspace.xml
+example/.idea/tasks.xml
+example/.idea/gradle.xml
+example/.idea/assetWizardSettings.xml
+example/.idea/dictionaries
+example/.idea/libraries
+example/.idea/caches
 # Keystore files
 # Uncomment the following lines if you do not want to check your keystore files in.
 #*.jks
