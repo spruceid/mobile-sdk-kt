@@ -41,6 +41,7 @@ import com.spruceid.mobile.sdk.MDoc
 import com.spruceid.mobile.sdk.PresentmentState
 import com.spruceid.mobile.sdk.getBluetoothManager
 import com.spruceid.mobile.sdk.getPermissions
+import com.spruceid.mobile.sdk.rs.Wallet
 import com.spruceid.mobilesdkexample.ui.theme.MobileSdkTheme
 import com.spruceid.mobilesdkexample.ui.theme.rememberQrBitmapPainter
 import java.security.KeyFactory
@@ -55,6 +56,8 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val wallet = Wallet()
 
         setContent {
             val viewModel by viewModels<CredentialsViewModel>()
@@ -125,10 +128,10 @@ class MainActivity : ComponentActivity() {
                                 verticalArrangement = Arrangement.SpaceAround,
                                 horizontalAlignment = Alignment.CenterHorizontally,
                             ) {
-                                if (session!!.qrCodeUri.isNotEmpty()) {
+                                if (session!!.getQrCodeUri().isNotEmpty()) {
                                     Image(
                                         painter = rememberQrBitmapPainter(
-                                            session!!.qrCodeUri,
+                                            session!!.getQrCodeUri(),
                                             300.dp,
                                             1.dp
                                         ),
