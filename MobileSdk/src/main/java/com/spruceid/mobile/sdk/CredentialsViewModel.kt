@@ -29,6 +29,9 @@ class CredentialsViewModel : ViewModel() {
     private val _session = MutableStateFlow<SessionData?>(null)
     val session = _session.asStateFlow()
 
+    private val _error = MutableStateFlow<Error?>(null)
+    val error = _error.asStateFlow()
+
     private val _allowedNamespaces =
         MutableStateFlow<Map<String, Map<String, List<String>>>>(mapOf())
     val allowedNamespaces = _allowedNamespaces.asStateFlow()
@@ -94,13 +97,26 @@ class CredentialsViewModel : ViewModel() {
             )
     }
 
+    fun cancel() {
+        _uuid.value = UUID.randomUUID()
+        _session.value = null
+        _currState.value = PresentmentState.UNINITIALIZED
+        _transport.value = null
+    }
+
     fun submitNamespaces(allowedNamespaces: Map<String, Map<String, List<String>>>) {
         val firstMDoc: MDoc = _credentials.value.first() as MDoc
+        if(allowedNamespaces.isEmpty()) {
+            val e = Error("Select at least one namespace")
+            Log.e("CredentialsViewModel.submitNamespaces", e.toString())
+            _currState.value = PresentmentState.ERROR
+            _error.value = e
+            throw e
+        }
         val payload = submitResponse(
             _requestData.value!!.sessionManager,
             allowedNamespaces
         )
-
 
         val ks: KeyStore = KeyStore.getInstance(
             "AndroidKeyStore"
@@ -126,6 +142,7 @@ class CredentialsViewModel : ViewModel() {
         } catch (e: Error) {
             Log.e("CredentialsViewModel.submitNamespaces", e.toString())
             _currState.value = PresentmentState.ERROR
+            _error.value = e
             throw e
         }
     }

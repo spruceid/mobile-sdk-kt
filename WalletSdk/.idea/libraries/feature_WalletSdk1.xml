@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="feature-WalletSdk1">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/build/intermediates/merged_java_res/debug/feature-WalletSdk.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
