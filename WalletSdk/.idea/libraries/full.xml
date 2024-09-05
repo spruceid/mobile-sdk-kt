@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="full">
-    <CLASSES>
-      <root url="jar://$PROJECT_DIR$/build/intermediates/full_jar/debug/full.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>

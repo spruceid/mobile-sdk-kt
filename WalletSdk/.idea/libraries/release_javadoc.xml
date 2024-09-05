@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="release-javadoc">
-    <CLASSES>
-      <root url="jar://$PROJECT_DIR$/build/intermediates/java_doc_jar/release/release-javadoc.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>
