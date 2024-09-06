@@ -47,6 +47,13 @@ captures/
 .idea/dictionaries
 .idea/libraries
 .idea/caches
+*/.idea/workspace.xml
+*/.idea/tasks.xml
+*/.idea/gradle.xml
+*/.idea/assetWizardSettings.xml
+*/.idea/dictionaries
+*/.idea/libraries
+*/.idea/caches
 
 # Keystore files
 # Uncomment the following lines if you do not want to check your keystore files in.
@@ -136,6 +143,23 @@ obj/
 .idea/sqlDataSources.xml
 .idea/dynamic.xml
 .idea/uiDesigner.xml
+*/.idea/caches/
+*/.idea/libraries/
+*/.idea/shelf/
+*/.idea/.name
+*/.idea/compiler.xml
+*/.idea/copyright/profiles_settings.xml
+*/.idea/encodings.xml
+*/.idea/misc.xml
+*/.idea/modules.xml
+*/.idea/scopes/scope_settings.xml
+*/.idea/vcs.xml
+*/.idea/jsLibraryMappings.xml
+*/.idea/datasources.xml
+*/.idea/dataSources.ids
+*/.idea/sqlDataSources.xml
+*/.idea/dynamic.xml
+*/.idea/uiDesigner.xml
 
 # OS-specific files
 .DS_Store
@@ -166,12 +190,14 @@ hs_err_pid*
 
 # mpeltonen/sbt-idea plugin
 .idea_modules/
+*/.idea_modules/
 
 # JIRA plugin
 atlassian-ide-plugin.xml
 
 # Mongo Explorer plugin
 .idea/mongoSettings.xml
+*/.idea/mongoSettings.xml
 
 # Crashlytics plugin (for Android Studio and IntelliJ)
 com_crashlytics_export_strings.xml
@@ -189,9 +215,15 @@ fabric.properties
 .idea/**/usage.statistics.xml
 .idea/**/dictionaries
 .idea/**/shelf
+*/.idea/**/workspace.xml
+*/.idea/**/tasks.xml
+*/.idea/**/usage.statistics.xml
+*/.idea/**/dictionaries
+*/.idea/**/shelf
 
 # Generated files
 .idea/**/contentModel.xml
+*/.idea/**/contentModel.xml
 
 # Sensitive or high-churn files
 .idea/**/dataSources/
@@ -201,10 +233,19 @@ fabric.properties
 .idea/**/dynamic.xml
 .idea/**/uiDesigner.xml
 .idea/**/dbnavigator.xml
+*/.idea/**/dataSources/
+*/.idea/**/dataSources.ids
+*/.idea/**/dataSources.local.xml
+*/.idea/**/sqlDataSources.xml
+*/.idea/**/dynamic.xml
+*/.idea/**/uiDesigner.xml
+*/.idea/**/dbnavigator.xml
 
 # Gradle
 .idea/**/gradle.xml
 .idea/**/libraries
+*/.idea/**/gradle.xml
+*/.idea/**/libraries
 
 # Gradle and Maven with auto-import
 # When using Gradle or Maven with auto-import, you should exclude module files,
@@ -219,6 +260,7 @@ cmake-build-*/
 
 # Mongo Explorer plugin
 .idea/**/mongoSettings.xml
+*/.idea/**/mongoSettings.xml
 
 # File-based project format
 
@@ -230,14 +272,17 @@ cmake-build-*/
 
 # Cursive Clojure plugin
 .idea/replstate.xml
+*/.idea/replstate.xml
 
 # Crashlytics plugin (for Android Studio and IntelliJ)
 
 # Editor-based Rest Client
 .idea/httpRequests
+*/.idea/httpRequests
 
 # Android studio 3.1+ serialized cache file
 .idea/caches/build_file_checksums.ser
+*/.idea/caches/build_file_checksums.ser
 
 ### Intellij Patch ###
 # Comment Reason: https://github.com/joeblau/gitignore.io/issues/186#issuecomment-215987721
@@ -249,6 +294,7 @@ cmake-build-*/
 
 # Sonarlint plugin
 .idea/sonarlint
+*/.idea/sonarlint
 
 ### Java ###
 # Compiled class file
