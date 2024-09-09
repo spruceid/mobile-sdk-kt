@@ -4,7 +4,6 @@ import android.bluetooth.BluetoothManager
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.spruceid.mobile.sdk.rs.Credential
 import com.spruceid.mobile.sdk.rs.ItemsRequest
 import com.spruceid.mobile.sdk.rs.Key
 import com.spruceid.mobile.sdk.rs.MdlPresentationSession
@@ -13,11 +12,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import java.security.KeyStore
-import java.security.Signature
 import java.util.UUID
 
-class CredentialsViewModel(val wallet: Wallet) : ViewModel() {
+class CredentialsViewModel(private val wallet: Wallet) : ViewModel() {
     private val _currState = MutableStateFlow(PresentmentState.UNINITIALIZED)
     val currState = _currState.asStateFlow()
 
@@ -31,12 +28,21 @@ class CredentialsViewModel(val wallet: Wallet) : ViewModel() {
         MutableStateFlow<Map<String, Map<String, List<String>>>>(mapOf())
     val allowedNamespaces = _allowedNamespaces.asStateFlow()
 
+    private val _credentials = MutableStateFlow(listOf<String>())
+    val credentials = _credentials.asStateFlow()
+
     private val _credentialId = MutableStateFlow<Key?>(null)
     val credentialId = _credentialId.asStateFlow()
 
     private val _uuid = MutableStateFlow<UUID>(UUID.randomUUID())
 
     private val _transport = MutableStateFlow<Transport?>(null)
+
+    fun gatherCredentialList() {
+        viewModelScope.launch(Dispatchers.IO) {
+            _credentials.value = wallet.getCredentialList()
+        }
+    }
 
     fun toggleAllowedNamespace(docType: String, specName: String, fieldName: String) {
         if (_allowedNamespaces.value.isEmpty()) {
