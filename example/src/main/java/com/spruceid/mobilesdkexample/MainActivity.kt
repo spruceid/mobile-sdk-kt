@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import com.spruceid.mobile.sdk.ConnectionLiveData
 import com.spruceid.mobile.sdk.CredentialsViewModel
+import com.spruceid.mobile.sdk.CredentialsViewModelFactory
 import com.spruceid.mobile.sdk.KeyManager
 import com.spruceid.mobile.sdk.PresentmentState
 import com.spruceid.mobile.sdk.getBluetoothManager
@@ -45,6 +46,7 @@ import com.spruceid.mobile.sdk.getPermissions
 import com.spruceid.mobile.sdk.rs.Credential
 import com.spruceid.mobile.sdk.rs.Key
 import com.spruceid.mobile.sdk.rs.Wallet
+import com.spruceid.mobile.sdk.rs.WalletException
 import com.spruceid.mobilesdkexample.ui.theme.MobileSdkTheme
 import com.spruceid.mobilesdkexample.ui.theme.rememberQrBitmapPainter
 import kotlinx.coroutines.CoroutineScope
@@ -74,20 +76,20 @@ class MainActivity : ComponentActivity(), CoroutineScope {
 
         val wallet = Wallet(StorageManager(this), KeyManager())
 
-        val mdoc = Credential(
-            UUID.randomUUID().toString(),
-            "mso_mdoc",
-            "org.iso.18013.5.1.mDL",
-            generateMDoc()
-        )
-
         launch {
-            val mdocKey = async(Dispatchers.IO) { wallet.addCredential(mdoc) }
+            val mdocKey = async(Dispatchers.IO) { wallet.addCredential(Credential(
+                UUID.randomUUID().toString(),
+                "mso_mdoc",
+                "org.iso.18013.5.1.mDL",
+                generateMDoc()
+            )) }
             setKey(mdocKey.await())
         }
 
         setContent {
-            val viewModel by viewModels<CredentialsViewModel>()
+            val viewModel: CredentialsViewModel by viewModels {
+                CredentialsViewModelFactory(wallet)
+            }
             var isConnected by remember { mutableStateOf(false) }
 
             connectionLiveData = ConnectionLiveData(this)
