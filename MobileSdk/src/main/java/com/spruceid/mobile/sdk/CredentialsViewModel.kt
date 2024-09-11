@@ -91,7 +91,7 @@ class CredentialsViewModel : ViewModel() {
                 _uuid.value,
                 "BLE",
                 "Central",
-                _session.value!!.bleIdent.toByteArray(),
+                _session.value!!.bleIdent,
                 ::updateRequestData,
                 null
             )

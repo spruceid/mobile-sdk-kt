@@ -45,7 +45,7 @@ public class BLESessionManager {
                     this.uuid,
                     "BLE",
                     "Central",
-                    sessionData.bleIdent.toByteArray(),
+                    sessionData.bleIdent,
                     ::updateRequestData,
                     callback
                 )
