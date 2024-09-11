@@ -4,6 +4,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.*
 import androidx.datastore.preferences.preferencesDataStoreFile
 import com.spruceid.mobile.sdk.KeyManager
+import com.spruceid.mobile.sdk.rs.EncryptedPayload
 import com.spruceid.mobile.sdk.rs.Key
 import com.spruceid.mobile.sdk.rs.StorageManagerException
 import com.spruceid.mobile.sdk.rs.StorageManagerInterface
@@ -37,8 +38,7 @@ private class DataStoreSingleton private constructor(context: Context) {
     }
 }
 
-class StorageManager(context: Context) : StorageManagerInterface {
-    private lateinit var context: Context
+class StorageManager(val context: Context) : StorageManagerInterface {
 
     /// Function: encrypt
     ///
@@ -53,8 +53,8 @@ class StorageManager(context: Context) : StorageManagerInterface {
                 keyManager.generateEncryptionKey(KEY_NAME)
             }
             val encrypted = keyManager.encryptPayload(KEY_NAME, value)
-            val iv = Base64.encodeToString(encrypted.first, B64_FLAGS)
-            val bytes = Base64.encodeToString(encrypted.second, B64_FLAGS)
+            val iv = Base64.encodeToString(encrypted.iv(), B64_FLAGS)
+            val bytes = Base64.encodeToString(encrypted.ciphertext(), B64_FLAGS)
             val res = "$iv;$bytes".toByteArray()
             return Result.success(res)
         } catch (e: Exception) {
@@ -79,7 +79,7 @@ class StorageManager(context: Context) : StorageManagerInterface {
             val iv = Base64.decode(decoded.first(), B64_FLAGS)
             val encrypted = Base64.decode(decoded.last(), B64_FLAGS)
             val decrypted =
-                keyManager.decryptPayload(KEY_NAME, iv, encrypted)
+                keyManager.decryptPayload(KEY_NAME, EncryptedPayload(iv, encrypted))
                     ?: return Result.failure(Exception("Failed to decrypt value"))
             return Result.success(decrypted.decodeToString())
         } catch (e: Exception) {
@@ -104,7 +104,7 @@ class StorageManager(context: Context) : StorageManagerInterface {
              throw StorageManagerException.InternalException()
         }
 
-        DataStoreSingleton.getInstance(this.context).dataStore.edit { store ->
+        DataStoreSingleton.getInstance(context).dataStore.edit { store ->
             store[storeKey] = storeValue.getOrThrow()
         }
     }
