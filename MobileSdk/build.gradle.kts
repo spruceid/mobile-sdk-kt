@@ -136,4 +136,5 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("com.android.support.test:runner:1.0.2")
     androidTestImplementation("com.android.support.test.espresso:espresso-core:3.0.2")
+    implementation("net.java.dev.jna:jna:5.14.0@aar")
 }
