@@ -1,32 +1,28 @@
 package com.spruceid.mobile.sdk
 
+import StorageManager
 import android.bluetooth.BluetoothManager
 import android.util.Log
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.spruceid.mobile.sdk.rs.ItemsRequest
 import com.spruceid.mobile.sdk.rs.Key
 import com.spruceid.mobile.sdk.rs.MdlPresentationSession
-import com.spruceid.mobile.sdk.rs.Wallet
+import com.spruceid.mobile.sdk.rs.VdcCollection
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.util.UUID
 
-class CredentialsViewModelFactory(private val wallet: Wallet) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return modelClass.getConstructor(Wallet::class.java).newInstance(wallet)
-    }
-}
-
-class CredentialsViewModel(private val wallet: Wallet) : ViewModel() {
+class CredentialsViewModel : ViewModel() {
     private val _currState = MutableStateFlow(PresentmentState.UNINITIALIZED)
     val currState = _currState.asStateFlow()
 
     private val _requestData = MutableStateFlow<List<ItemsRequest>?>(null)
     val requestData = _requestData.asStateFlow()
+
+    private val _vdcCollection = MutableStateFlow<VdcCollection>(VdcCollection(StorageManager()))
 
     private val _session = MutableStateFlow<MdlPresentationSession?>(null)
     val session = _session.asStateFlow()
