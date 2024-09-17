@@ -8,6 +8,7 @@ import com.spruceid.mobilesdkexample.HomeView
 import com.spruceid.mobilesdkexample.verifier.VerifyDLView
 import com.spruceid.mobilesdkexample.verifier.VerifyEAView
 import com.spruceid.mobilesdkexample.verifier.VerifyVCView
+import com.spruceid.mobilesdkexample.verifiersettings.VerifierSettingsHomeView
 
 @Composable
 fun SetupNavGraph(
@@ -15,7 +16,7 @@ fun SetupNavGraph(
 ) {
     NavHost(
         navController = navController,
-        startDestination = Screen.HomeScreen.route,
+        startDestination = Screen.HomeScreen.route
     ) {
         composable(
             route = Screen.HomeScreen.route,
@@ -36,6 +37,11 @@ fun SetupNavGraph(
             route = Screen.VerifyVCScreen.route,
         ) {
             VerifyVCView(navController)
+        }
+        composable(
+            route = Screen.VerifierSettingsHomeScreen.route,
+        ) {
+            VerifierSettingsHomeView(navController)
         }
 
     }

@@ -3,6 +3,7 @@
     <color name="primary">#FFF7F7F5</color>
     <color name="bg">#FFFDFDFC</color>
     <color name="credential_border">#FFE6E1D6</color>
+    <color name="code_border">#ff949494</color>
     <color name="green_valid">#FF059669</color>
     <color name="text_body">#FF57534E</color>
     <color name="text_header">#FF0C0A09</color>

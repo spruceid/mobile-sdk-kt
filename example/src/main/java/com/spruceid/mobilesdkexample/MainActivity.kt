@@ -1,17 +1,18 @@
 package com.spruceid.mobilesdkexample
 
+import android.app.Application
 import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.spruceid.mobile.sdk.CredentialsViewModel
+import com.spruceid.mobilesdkexample.db.AppDatabase
+import com.spruceid.mobilesdkexample.db.VerificationActivityLogsRepository
 import com.spruceid.mobilesdkexample.navigation.SetupNavGraph
 import com.spruceid.mobilesdkexample.ui.theme.Bg
 import com.spruceid.mobilesdkexample.ui.theme.MobileSdkTheme
