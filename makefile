@@ -29,6 +29,10 @@ clean: #@ Clean the build.
 build: #@ Make the build; currently not working, use 'install' instead.
 	@$(GRADLE) build
 
+.phony: lint
+lint: #@ Lint the build.
+	@$(GRADLE) lintDebug
+
 .phony: install
 install: #@ Install the build to all devices.
 	@$(GRADLE) installDebug

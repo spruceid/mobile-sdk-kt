@@ -412,17 +412,29 @@ class GattClient(private var callback: GattClientCallback,
                             // The android docs recommend cancelling discovery before connecting a socket for
                             // perfomance reasons.
 
-                            btAdapter?.cancelDiscovery()
+                            try {
+                                btAdapter?.cancelDiscovery()
+                            } catch (e: SecurityException) {
+                                reportLog("Unable to cancel discovery.")
+                            }
 
                             val connectThread: Thread = object : Thread() {
                                 override fun run() {
                                     try {
                                         // createL2capChannel() requires/initiates pairing, so we have to use
-                                        // the "insecure" version.
-                                        l2capSocket = device.createInsecureL2capChannel(channelPSM)
-                                        l2capSocket?.connect()
+                                        // the "insecure" version.  This requires at least API 29, which we did
+                                        // check elsewhere (we'd never have got this far on a lower API), but
+                                        // the linter isn't smart enough to know that, and we have PR merging
+                                        // gated on a clean bill of health from the linter...
+                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                                            l2capSocket = device.createInsecureL2capChannel(channelPSM)
+                                            l2capSocket?.connect()
+                                        }
                                     } catch (e: IOException) {
                                         reportError("Error connecting to L2CAP socket: ${e.message}")
+                                        return
+                                    } catch (e: SecurityException) {
+                                        reportError("Not authorized to connect to L2CAP socket.")
                                         return
                                     }
 
@@ -470,7 +482,7 @@ class GattClient(private var callback: GattClientCallback,
                     reportError("Failure reading request, peer disconnected.")
                     return
                 }
-                payload.writeBytes(buf)
+                payload.write(buf, 0, buf.count())
 
                 dprint("Currently have ${buf.count()} bytes.")
 
@@ -545,29 +557,33 @@ class GattClient(private var callback: GattClientCallback,
         dprint("-- ind: ${characteristic.getProperties()}")
 
 
-        if (!gatt.setCharacteristicNotification(characteristic, true)) {
-            reportError("Error setting notification on ${name}; call failed.")
-            return
-        }
-
-        val descriptor: BluetoothGattDescriptor = characteristic.getDescriptor(clientCharacteristicConfigUuid)
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            val res = gatt.writeDescriptor(descriptor, BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE)
-            if(res != BluetoothStatusCodes.SUCCESS) {
-                reportError("Error writing to ${name}. Code: $res")
+        try {
+            if (!gatt.setCharacteristicNotification(characteristic, true)) {
+                reportError("Error setting notification on ${name}; call failed.")
                 return
             }
-        } else {
-            // Above code addresses the deprecation but requires API 33+
-            @Suppress("deprecation")
-            descriptor.value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
 
-            @Suppress("deprecation")
-            if (!gatt.writeDescriptor(descriptor)) {
-                reportError("Error writing to ${name} clientCharacteristicConfig: desc.")
-                return
+            val descriptor: BluetoothGattDescriptor = characteristic.getDescriptor(clientCharacteristicConfigUuid)
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                val res = gatt.writeDescriptor(descriptor, BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE)
+                if(res != BluetoothStatusCodes.SUCCESS) {
+                    reportError("Error writing to ${name}. Code: $res")
+                    return
+                }
+            } else {
+                // Above code addresses the deprecation but requires API 33+
+                @Suppress("deprecation")
+                descriptor.value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
+                
+                @Suppress("deprecation")
+                if (!gatt.writeDescriptor(descriptor)) {
+                    reportError("Error writing to ${name} clientCharacteristicConfig: desc.")
+                    return
+                }
             }
+        } catch (e: SecurityException) {
+            reportError("Not authorized to enable notification on ${name}")
         }
 
         // An onDescriptorWrite() call will come in for the pair of this characteristic and the client
@@ -608,8 +624,12 @@ class GattClient(private var callback: GattClientCallback,
             // when we call connect() on the socket we get a "no resources available" exception, and
             // the socket remains unopen.
 
-            //usingL2CAP = characteristicL2CAP != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
-            usingL2CAP = false
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                //usingL2CAP = characteristicL2CAP != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
+                usingL2CAP = false
+            } else {
+                usingL2CAP = false
+            }
 
             if (usingL2CAP) {
                 enableNotification(gatt, characteristicL2CAP, "L2CAP")
