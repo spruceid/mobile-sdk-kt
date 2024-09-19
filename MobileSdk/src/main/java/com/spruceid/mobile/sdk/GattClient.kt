@@ -285,10 +285,9 @@ class GattClient(private var callback: GattClientCallback,
                     if (descriptor.uuid.equals(clientCharacteristicConfigUuid)) {
 
                         if (setL2CAPNotify) {
-                            dprint("Notify already set for l2cap characteristic, doing nothing.")
+                            reportLog("Notify already set for l2cap characteristic, doing nothing.")
                         } else {
                             setL2CAPNotify = true
-                            dprint("Wrote NOTIFY, got accepted.")
                             if (!gatt.readCharacteristic(characteristicL2CAP)) {
                                 reportError("Error reading L2CAP characteristic.")
                             }
@@ -359,8 +358,6 @@ class GattClient(private var callback: GattClientCallback,
                         reportError("Invalid data length ${value.size} for Server2Client characteristic.")
                         return
                     }
-
-                    Log.d("GattClient.onCharacteristicChanged", byteArrayToHex(value))
 
                     incomingMessage.write(value, 1, value.size - 1)
 
@@ -454,7 +451,7 @@ class GattClient(private var callback: GattClientCallback,
                 }
 
                 else -> {
-                    dprint("Unknown Changed: ${value.size}")
+                    reportLog("Unknown Changed: ${value.size}")
                 }
             }
         }
@@ -486,6 +483,21 @@ class GattClient(private var callback: GattClientCallback,
 
                 dprint("Currently have ${buf.count()} bytes.")
 
+                // We are receiving this data over a stream socket and do not know how large the
+                // message is; there is no framing information provided, the only way we have to
+                // know whether we have the full message is whether any more data comes in after.
+                // To determine this, we take a timestamp, and schedule an event for half a second
+                // later; if nothing has come in the interim, we assume that to be the full
+                // message.
+                //
+                // Technically, we could also attempt to decode the message (it's CBOR-encoded)
+                // to see if it decodes properly.  Unfortunately, this is potentially subject to
+                // false positives; CBOR has several primitives which have unbounded length. For
+                // messages unsing those primitives, the message length is inferred from the
+                // source data length, so if the (incomplete) message end happened to fall on a
+                // primitive boundary (which is quite likely if a higher MTU isn't negotiated) an
+                // incomplete message could "cleanly" decode.
+
                 requestTimestamp = TimeSource.Monotonic.markNow()
 
                 Executors.newSingleThreadScheduledExecutor()
@@ -494,7 +506,7 @@ class GattClient(private var callback: GattClientCallback,
                                   if ((curtime - requestTimestamp) > 500.milliseconds) {
                                       val message = payload.toByteArray()
 
-                                      dprint("Request complete: ${message.count()} bytes.")
+                                      reportLog("Request complete: ${message.count()} bytes.")
                                       callback.onMessageReceived(message)
                                   }
                               }, 500, TimeUnit.MILLISECONDS)
@@ -532,7 +544,9 @@ class GattClient(private var callback: GattClientCallback,
         }
 
         try {
-            // TODO: This is to work around a bug in L2CAP
+            // Workaround for L2CAP socket behaviour; attempting to close it too quickly can
+            // result in an error return from .close(), and then potentially leave the socket hanging
+            // open indefinitely if not caught.
             Thread.sleep(1000)
             l2capSocket!!.close()
         } catch (e: IOException) {
@@ -547,15 +561,12 @@ class GattClient(private var callback: GattClientCallback,
      * be, and isn't complete until onDescriptorWrite() is hit; it triggers an async action.
      */
     private fun enableNotification(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic?, name: String) {
-        dprint("Enabling notifications on ${name}")
+        reportLog("Enabling notifications on ${name}")
 
         if (characteristic == null) {
             reportError("Error setting notification on ${name}; is null.")
             return
         }
-
-        dprint("-- ind: ${characteristic.getProperties()}")
-
 
         try {
             if (!gatt.setCharacteristicNotification(characteristic, true)) {
@@ -591,7 +602,7 @@ class GattClient(private var callback: GattClientCallback,
     }
 
     /**
-     * Log stuff to the console.
+     * Log stuff to the console without hitting the callback.
      */
     private fun dprint(text: String) {
         Log.d("[GattClient]", text)
@@ -601,7 +612,7 @@ class GattClient(private var callback: GattClientCallback,
      * Log stuff both to the callback and to the console.
      */
     private fun reportLog(text: String) {
-        dprint(text)
+        Log.d("[GattClient]", "ERROR: ${text}")
         callback.onLog(text)
     }
 
@@ -609,7 +620,7 @@ class GattClient(private var callback: GattClientCallback,
      * Log an error both to the callback and the console.
      */
     private fun reportError(text: String) {
-        dprint("ERROR: ${text}")
+        Log.e("[GattClient]", "ERROR: ${text}")
         callback.onError(Error(text))
     }
 

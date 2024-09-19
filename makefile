@@ -24,10 +24,9 @@ help: #@ Makefile help.
 clean: #@ Clean the build.
 	@$(GRADLE) clean
 
-# Throws an exception for some reason I haven't looked into yet.
 .phony: build
-build: #@ Make the build; currently not working, use 'install' instead.
-	@$(GRADLE) build
+build: #@ Make the release build.
+	@$(GRADLE) assembleRelease
 
 .phony: lint
 lint: #@ Lint the build.
