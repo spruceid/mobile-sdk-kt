@@ -10,4 +10,6 @@
     <string name="arrow_right">Arrow right</string>
     <string name="valid_check">Valid credential</string>
     <string name="invalid_check">Invalid credential</string>
+    <string name="verification_activity_log">Verification Activity Log</string>
+    <string name="chevron">Start action</string>
 </resources>
