@@ -88,7 +88,7 @@ fun HomeView(
     ) {
         Box(modifier = Modifier.padding(bottom = 30.dp)) {
             if (tab == HomeTabs.WALLET) {
-                WalletHomeView()
+                WalletHomeView(navController = navController)
             } else {
                 VerifierHomeView(navController = navController)
             }

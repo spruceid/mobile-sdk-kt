@@ -1,14 +1,19 @@
 package com.spruceid.mobilesdkexample.navigation
 
+import android.util.Log
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navDeepLink
 import com.spruceid.mobilesdkexample.HomeView
 import com.spruceid.mobilesdkexample.verifier.VerifyDLView
 import com.spruceid.mobilesdkexample.verifier.VerifyEAView
 import com.spruceid.mobilesdkexample.verifier.VerifyVCView
 import com.spruceid.mobilesdkexample.verifiersettings.VerifierSettingsHomeView
+import com.spruceid.mobilesdkexample.wallet.AddToWalletView
+import com.spruceid.mobilesdkexample.walletsettings.WalletSettingsHomeView
 
 @Composable
 fun SetupNavGraph(
@@ -43,6 +48,32 @@ fun SetupNavGraph(
         ) {
             VerifierSettingsHomeView(navController)
         }
-
+        composable(
+            route = Screen.WalletSettingsHomeScreen.route,
+        ) {
+            WalletSettingsHomeView(navController)
+        }
+        composable(
+            route = Screen.AddToWalletScreen.route,
+            deepLinks = listOf(
+                navDeepLink {
+                    uriPattern = "spruceid://?sd-jwt={rawCredential}"
+                }
+            )
+        ) { backStackEntry ->
+            val rawCredential = backStackEntry.arguments?.getString("rawCredential")!!
+            AddToWalletView(rawCredential = rawCredential)
+        }
+        composable(
+            route = Screen.OID4VPScreen.route,
+            deepLinks = listOf(
+                navDeepLink {
+                    uriPattern = "oid4vp://{params}"
+                }
+            )
+        ) {
+            // val params = backStackEntry.arguments?.getString("params")!!
+            Text(text = "@TODO: OID4VP flow")
+        }
     }
 }
