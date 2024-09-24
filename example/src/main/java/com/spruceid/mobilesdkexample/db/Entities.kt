@@ -13,3 +13,9 @@ data class VerificationActivityLogs(
   val expirationDate: Date,
   val status: String,
 )
+
+@Entity(tableName = "raw_credentials")
+data class RawCredentials(
+  @PrimaryKey(autoGenerate = true) val id: Long = 0,
+  val rawCredential: String,
+)

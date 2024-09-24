@@ -1,6 +1,5 @@
 package com.spruceid.mobilesdkexample.navigation
 
-import android.util.Log
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
@@ -12,12 +11,14 @@ import com.spruceid.mobilesdkexample.verifier.VerifyDLView
 import com.spruceid.mobilesdkexample.verifier.VerifyEAView
 import com.spruceid.mobilesdkexample.verifier.VerifyVCView
 import com.spruceid.mobilesdkexample.verifiersettings.VerifierSettingsHomeView
+import com.spruceid.mobilesdkexample.viewmodels.IRawCredentialsViewModel
 import com.spruceid.mobilesdkexample.wallet.AddToWalletView
 import com.spruceid.mobilesdkexample.walletsettings.WalletSettingsHomeView
 
 @Composable
 fun SetupNavGraph(
-    navController: NavHostController
+    navController: NavHostController,
+    rawCredentialsViewModel: IRawCredentialsViewModel
 ) {
     NavHost(
         navController = navController,
@@ -26,7 +27,7 @@ fun SetupNavGraph(
         composable(
             route = Screen.HomeScreen.route,
         ) {
-            HomeView(navController)
+            HomeView(navController, rawCredentialsViewModel)
         }
         composable(
             route = Screen.VerifyDLScreen.route,
@@ -62,7 +63,7 @@ fun SetupNavGraph(
             )
         ) { backStackEntry ->
             val rawCredential = backStackEntry.arguments?.getString("rawCredential")!!
-            AddToWalletView(rawCredential = rawCredential)
+            AddToWalletView(navController, rawCredential, rawCredentialsViewModel)
         }
         composable(
             route = Screen.OID4VPScreen.route,

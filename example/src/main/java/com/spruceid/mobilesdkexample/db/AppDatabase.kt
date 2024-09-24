@@ -6,10 +6,17 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 
-@Database(entities = [VerificationActivityLogs::class], version = 1)
+@Database(
+  entities = [
+    VerificationActivityLogs::class,
+    RawCredentials::class,
+  ],
+  version = 2
+)
 @TypeConverters(*[DateConverter::class])
 abstract class AppDatabase : RoomDatabase() {
   abstract fun verificationActivityLogsDao(): VerificationActivityLogsDao
+  abstract fun rawCredentialsDao(): RawCredentialsDao
 
   companion object {
     @Volatile
@@ -21,7 +28,7 @@ abstract class AppDatabase : RoomDatabase() {
           Room.databaseBuilder(
             context.applicationContext,
             AppDatabase::class.java,
-            "verification_activity_logs",
+            "referenceAppDb",
           )
             .allowMainThreadQueries()
             .build()

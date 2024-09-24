@@ -12,3 +12,12 @@ interface VerificationActivityLogsDao {
   @Query("SELECT * FROM verification_activity_logs")
   fun getAllVerificationActivityLogs(): List<VerificationActivityLogs>
 }
+
+@Dao
+interface RawCredentialsDao {
+  @Insert
+  suspend fun insertRawCredential(rawCredential: RawCredentials)
+
+  @Query("SELECT * FROM raw_credentials")
+  fun getAllRawCredentials(): List<RawCredentials>
+}
