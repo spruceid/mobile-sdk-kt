@@ -52,7 +52,7 @@ fun SetupNavGraph(
         composable(
             route = Screen.WalletSettingsHomeScreen.route,
         ) {
-            WalletSettingsHomeView(navController)
+            WalletSettingsHomeView(navController, rawCredentialsViewModel)
         }
         composable(
             route = Screen.AddToWalletScreen.route,

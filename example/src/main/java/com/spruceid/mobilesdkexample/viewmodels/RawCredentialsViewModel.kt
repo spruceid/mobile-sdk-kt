@@ -13,6 +13,7 @@ import kotlinx.coroutines.launch
 abstract class IRawCredentialsViewModel : ViewModel(){
   abstract val rawCredentials: StateFlow<List<RawCredentials>>
   abstract suspend fun saveRawCredential(rawCredential: RawCredentials)
+  abstract suspend fun deleteAllRawCredentials()
   abstract fun generateRawCredentialsCSV(): String
 }
 
@@ -28,6 +29,11 @@ class RawCredentialsViewModel(private val rawCredentialsRepository: RawCredentia
 
   override suspend fun saveRawCredential(rawCredential: RawCredentials) {
     rawCredentialsRepository.insertRawCredential(rawCredential)
+    _rawCredentials.value = rawCredentialsRepository.getRawCredentials()
+  }
+
+  override suspend fun deleteAllRawCredentials() {
+    rawCredentialsRepository.deleteAllRawCredentials()
     _rawCredentials.value = rawCredentialsRepository.getRawCredentials()
   }
 
@@ -49,6 +55,8 @@ class RawCredentialsViewModelPreview(override val rawCredentials: StateFlow<List
   emptyList()
 )) : IRawCredentialsViewModel() {
   override suspend fun saveRawCredential(credential: RawCredentials) {}
+
+  override suspend fun deleteAllRawCredentials() {}
 
   override fun generateRawCredentialsCSV(): String {
     return ""

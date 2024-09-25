@@ -95,17 +95,9 @@ fun WalletHomeBody(rawCredentialsViewModel: IRawCredentialsViewModel) {
             .padding(top = 20.dp)
     ) {
         items(rawCredentials) { rawCredential ->
-            Text(
-                text = "${rawCredential.id}",
-                fontFamily = Inter,
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 17.sp,
-//                        color = PrimaryDark,
-                modifier = Modifier.padding(bottom = 4.dp),
-            )
+            AchievementCredentialItem(rawCredential.rawCredential).component()
         }
         item {
-            AchievementCredentialItem(rawCredential = "{}").component()
             vcs.map { vc ->
                 GenericCredentialListItems(vc = vc)
             }

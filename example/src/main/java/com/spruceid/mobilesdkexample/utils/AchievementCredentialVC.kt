@@ -6,6 +6,7 @@ val mockAchievementCredential = """
     "https://www.w3.org/ns/credentials/v2",
     "https://purl.imsglobal.org/spec/ob/v3p0/context-3.0.3.json"
   ],
+  "awardedDate": "2024-09-23T18:12:12+0000",
   "achievement": {
     "name": "Team Membership",
     "type": "Achievement"

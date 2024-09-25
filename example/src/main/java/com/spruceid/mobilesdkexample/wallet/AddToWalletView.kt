@@ -1,9 +1,7 @@
 package com.spruceid.mobilesdkexample.wallet
 
-import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -41,8 +39,6 @@ fun AddToWalletView(
 ) {
     val credential = AchievementCredentialItem(rawCredential)
     val scope = rememberCoroutineScope()
-
-    Log.d("AAA", rawCredential)
 
     Column(
         Modifier
@@ -100,7 +96,7 @@ fun AddToWalletView(
 
         Button(
             onClick = {
-//                navController.popBackStack()
+                navController.popBackStack()
             },
             shape = RoundedCornerShape(5.dp),
             colors =  ButtonDefaults.buttonColors(

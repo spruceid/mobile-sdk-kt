@@ -28,4 +28,9 @@ class RawCredentialsRepository(private val rawCredentialsDao: RawCredentialsDao)
   suspend fun getRawCredentials(): List<RawCredentials> {
     return rawCredentialsDao.getAllRawCredentials()
   }
+
+  @WorkerThread
+  suspend fun deleteAllRawCredentials(): Int {
+    return rawCredentialsDao.deleteAllRawCredentials()
+  }
 }

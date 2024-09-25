@@ -20,4 +20,7 @@ interface RawCredentialsDao {
 
   @Query("SELECT * FROM raw_credentials")
   fun getAllRawCredentials(): List<RawCredentials>
+
+  @Query("DELETE FROM raw_credentials")
+  fun deleteAllRawCredentials(): Int
 }

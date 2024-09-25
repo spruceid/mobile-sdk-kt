@@ -12,6 +12,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
@@ -27,10 +28,13 @@ import com.spruceid.mobilesdkexample.R
 import com.spruceid.mobilesdkexample.ui.theme.Inter
 import com.spruceid.mobilesdkexample.ui.theme.TextHeader
 import com.spruceid.mobilesdkexample.ui.theme.VerifiedRedInvalid
+import com.spruceid.mobilesdkexample.viewmodels.IRawCredentialsViewModel
+import kotlinx.coroutines.launch
 
 @Composable
 fun WalletSettingsHomeView(
-    navController: NavController
+    navController: NavController,
+    rawCredentialsViewModel: IRawCredentialsViewModel
 ) {
     Column(
         Modifier
@@ -42,7 +46,7 @@ fun WalletSettingsHomeView(
                 navController.popBackStack()
             }
         )
-        WalletSettingsHomeBody()
+        WalletSettingsHomeBody(rawCredentialsViewModel)
     }
 }
 
@@ -77,7 +81,9 @@ fun WalletSettingsHomeHeader(
 }
 
 @Composable
-fun WalletSettingsHomeBody() {
+fun WalletSettingsHomeBody(rawCredentialsViewModel: IRawCredentialsViewModel) {
+    val scope = rememberCoroutineScope()
+
     Column(
         Modifier
             .padding(horizontal = 20.dp)
@@ -85,7 +91,9 @@ fun WalletSettingsHomeBody() {
     ) {
         Button(
             onClick = {
-                // TODO
+                scope.launch {
+                    rawCredentialsViewModel.deleteAllRawCredentials()
+                }
             },
             shape = RoundedCornerShape(5.dp),
             colors =  ButtonDefaults.buttonColors(
