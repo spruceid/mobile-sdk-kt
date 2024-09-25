@@ -1,6 +1,5 @@
 package com.spruceid.mobilesdkexample.wallet
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -34,7 +33,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.spruceid.mobile.sdk.W3CVC
+import com.spruceid.mobile.sdk.rs.decodeRevealSdJwt
 import com.spruceid.mobilesdkexample.R
 import com.spruceid.mobilesdkexample.ui.theme.Bg
 import com.spruceid.mobilesdkexample.ui.theme.CredentialBorder
@@ -42,15 +41,10 @@ import com.spruceid.mobilesdkexample.ui.theme.GreenValid
 import com.spruceid.mobilesdkexample.ui.theme.Inter
 import com.spruceid.mobilesdkexample.ui.theme.TextBody
 import com.spruceid.mobilesdkexample.ui.theme.TextHeader
-import com.spruceid.mobilesdkexample.utils.mockAchievementCredential
 import org.json.JSONArray
 import org.json.JSONObject
-import java.text.SimpleDateFormat
-import java.time.LocalDateTime
 import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
-import java.util.Date
-import java.util.Locale
 
 class AchievementCredentialItem {
     private var credential: JSONObject
@@ -60,8 +54,8 @@ class AchievementCredentialItem {
     }
 
     constructor(rawCredential: String) {
-        // @TODO: remove mock
-        this.credential = JSONObject(mockAchievementCredential)
+        val decodedSdJwt = decodeRevealSdJwt(rawCredential)
+        this.credential = JSONObject(decodedSdJwt)
     }
 
     @Composable
