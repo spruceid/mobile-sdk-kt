@@ -1,5 +1,7 @@
 package com.spruceid.mobilesdkexample.wallet
 
+import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -22,6 +24,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.spruceid.mobilesdkexample.db.RawCredentials
+import com.spruceid.mobilesdkexample.navigation.Screen
 import com.spruceid.mobilesdkexample.ui.theme.CTAButtonGreen
 import com.spruceid.mobilesdkexample.ui.theme.Inter
 import com.spruceid.mobilesdkexample.ui.theme.MobileSdkTheme
@@ -29,8 +32,10 @@ import com.spruceid.mobilesdkexample.ui.theme.SecondaryButtonRed
 import com.spruceid.mobilesdkexample.ui.theme.TextHeader
 import com.spruceid.mobilesdkexample.viewmodels.IRawCredentialsViewModel
 import com.spruceid.mobilesdkexample.viewmodels.RawCredentialsViewModelPreview
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
+@SuppressLint("RestrictedApi")
 @Composable
 fun AddToWalletView(
     navController: NavHostController,
@@ -75,7 +80,10 @@ fun AddToWalletView(
                     rawCredentialsViewModel.saveRawCredential(RawCredentials(
                         rawCredential = rawCredential
                     ))
-                    navController.popBackStack()
+
+                    navController.navigate(Screen.HomeScreen.route) {
+                        popUpTo(0)
+                    }
                 }
             },
             shape = RoundedCornerShape(5.dp),

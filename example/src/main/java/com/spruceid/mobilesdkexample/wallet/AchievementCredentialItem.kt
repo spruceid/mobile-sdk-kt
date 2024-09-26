@@ -60,7 +60,7 @@ class AchievementCredentialItem {
 
     @Composable
     fun listComponent() {
-        val achievementName = keyPathFinder(credential, mutableListOf("achievement", "name")).toString()
+        val achievementName = keyPathFinder(credential, mutableListOf("name")).toString()
         val issuerName = keyPathFinder(credential, mutableListOf("issuer", "name")).toString()
 
         Row(
