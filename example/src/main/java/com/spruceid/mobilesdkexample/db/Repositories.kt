@@ -15,3 +15,22 @@ class VerificationActivityLogsRepository(private val verificationActivityLogsDao
     return verificationActivityLogsDao.getAllVerificationActivityLogs()
   }
 }
+
+class RawCredentialsRepository(private val rawCredentialsDao: RawCredentialsDao) {
+  val rawCredentials: List<RawCredentials> = rawCredentialsDao.getAllRawCredentials()
+
+  @WorkerThread
+  suspend fun insertRawCredential(credential: RawCredentials) {
+    rawCredentialsDao.insertRawCredential(credential)
+  }
+
+  @WorkerThread
+  suspend fun getRawCredentials(): List<RawCredentials> {
+    return rawCredentialsDao.getAllRawCredentials()
+  }
+
+  @WorkerThread
+  suspend fun deleteAllRawCredentials(): Int {
+    return rawCredentialsDao.deleteAllRawCredentials()
+  }
+}

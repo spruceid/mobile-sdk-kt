@@ -18,4 +18,6 @@
     <color name="verified_red_invalid">#FFBE123C</color>
     <color name="verifier_close_button">#FF44403C</color>
     <color name="spruce_blue">#FF2F6AE1</color>
+    <color name="secondary_button_red">#FFE11D48</color>
+    <color name="cta_button_green">#FF087455</color>
 </resources>

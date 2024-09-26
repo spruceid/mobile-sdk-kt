@@ -6,16 +6,19 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.spruceid.mobilesdkexample.db.AppDatabase
-import com.spruceid.mobilesdkexample.db.VerificationActivityLogsRepository
+import com.spruceid.mobilesdkexample.db.RawCredentialsRepository
 import com.spruceid.mobilesdkexample.navigation.SetupNavGraph
 import com.spruceid.mobilesdkexample.ui.theme.Bg
 import com.spruceid.mobilesdkexample.ui.theme.MobileSdkTheme
+import com.spruceid.mobilesdkexample.viewmodels.IRawCredentialsViewModel
+import com.spruceid.mobilesdkexample.viewmodels.RawCredentialsViewModelFactory
 
 class MainActivity : ComponentActivity() {
     private lateinit var navController: NavHostController
@@ -38,9 +41,17 @@ class MainActivity : ComponentActivity() {
                 ) {
                     navController = rememberNavController()
 
-                    SetupNavGraph(navController = navController)
+                    val credentialsViewModel: IRawCredentialsViewModel by viewModels {
+                        RawCredentialsViewModelFactory((application as MainApplication).rawCredentialsRepository)
+                    }
+                    SetupNavGraph(navController, credentialsViewModel)
                 }
             }
         }
     }
+}
+
+class MainApplication : Application() {
+    val db by lazy { AppDatabase.getDatabase(applicationContext) }
+    val rawCredentialsRepository by lazy { RawCredentialsRepository(db.rawCredentialsDao()) }
 }
