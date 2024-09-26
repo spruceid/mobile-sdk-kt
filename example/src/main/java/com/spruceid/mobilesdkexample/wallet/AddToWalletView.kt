@@ -1,7 +1,5 @@
 package com.spruceid.mobilesdkexample.wallet
 
-import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -32,10 +30,8 @@ import com.spruceid.mobilesdkexample.ui.theme.SecondaryButtonRed
 import com.spruceid.mobilesdkexample.ui.theme.TextHeader
 import com.spruceid.mobilesdkexample.viewmodels.IRawCredentialsViewModel
 import com.spruceid.mobilesdkexample.viewmodels.RawCredentialsViewModelPreview
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
-@SuppressLint("RestrictedApi")
 @Composable
 fun AddToWalletView(
     navController: NavHostController,
@@ -127,7 +123,7 @@ fun AddToWalletView(
 @Preview(showBackground = true)
 @Composable
 fun AddToWalletPreview() {
-    var navController: NavHostController = rememberNavController()
+    val navController: NavHostController = rememberNavController()
 
     MobileSdkTheme {
         AddToWalletView(
