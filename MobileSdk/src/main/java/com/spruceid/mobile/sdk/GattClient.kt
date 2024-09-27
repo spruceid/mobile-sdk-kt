@@ -47,6 +47,10 @@ class GattClient(private var callback: GattClientCallback,
         UUID.fromString("00002902-0000-1000-8000-00805f9b34fb")
     private val L2CAP_BUFFER_SIZE = (1 shl 16) // 64K
 
+    enum class UseL2CAP { IfAvailable, Yes, No }
+
+    private var useL2CAP = UseL2CAP.IfAvailable
+
     var gattClient: BluetoothGatt? = null
 
     var characteristicState: BluetoothGattCharacteristic? = null
@@ -60,7 +64,6 @@ class GattClient(private var callback: GattClientCallback,
     private var writeIsOutstanding = false
     private var writingQueue: Queue<ByteArray> = ArrayDeque()
     private var writingQueueTotalChunks = 0
-    private var usingL2CAP = false
     private var setL2CAPNotify = false
     private var channelPSM = 0
     private var l2capSocket: BluetoothSocket? = null
@@ -429,6 +432,12 @@ class GattClient(private var callback: GattClientCallback,
                                         }
                                     } catch (e: IOException) {
                                         reportError("Error connecting to L2CAP socket: ${e.message}")
+
+                                        // Something went wrong.  Fall back to the old flow, don't try L2CAP
+                                        // again for this run.
+                                        useL2CAP = UseL2CAP.No
+                                        enableNotification(gatt, characteristicServer2Client, "Server2Client")
+
                                         return
                                     } catch (e: SecurityException) {
                                         reportError("Not authorized to connect to L2CAP socket.")
@@ -612,8 +621,9 @@ class GattClient(private var callback: GattClientCallback,
      * Log stuff both to the callback and to the console.
      */
     private fun reportLog(text: String) {
-        Log.d("[GattClient]", "ERROR: ${text}")
-        callback.onLog(text)
+        Log.d("[GattClient]", "${text}")
+
+        //callback.onLog(text) // Appears to mess with transfer timing, disabled for now.
     }
 
     /**
@@ -631,21 +641,18 @@ class GattClient(private var callback: GattClientCallback,
         try {
             // Use L2CAP if supported by GattServer and by this OS version
 
-            // L2CAP use disabled for now; the plumbing is all in place, and it ought to work, but
-            // when we call connect() on the socket we get a "no resources available" exception, and
-            // the socket remains unopen.
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                //usingL2CAP = characteristicL2CAP != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
-                usingL2CAP = false
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && characteristicL2CAP != null) {
+                if (useL2CAP == UseL2CAP.IfAvailable) {
+                    useL2CAP = UseL2CAP.Yes
+                }
             } else {
-                usingL2CAP = false
+                useL2CAP = UseL2CAP.No
             }
 
-            if (usingL2CAP) {
+            if (useL2CAP == UseL2CAP.Yes) {
                 enableNotification(gatt, characteristicL2CAP, "L2CAP")
 
-                reportLog("Using L2CAP: $usingL2CAP")
+                reportLog("Using L2CAP: $useL2CAP")
 
                 //// value is returned async above in onCharacteristicRead()
 
@@ -720,7 +727,7 @@ class GattClient(private var callback: GattClientCallback,
     fun sendMessage(data: ByteArray) {
         reportLog("Sending message: $data")
 
-        if (usingL2CAP) {
+        if (useL2CAP == UseL2CAP.Yes) {
             responseData.add(data)
         } else {
 
@@ -760,7 +767,7 @@ class GattClient(private var callback: GattClientCallback,
      * When using L2CAP it doesn't support characteristics notification.
      */
     fun supportsTransportSpecificTerminationMessage(): Boolean {
-        return !usingL2CAP
+        return useL2CAP != UseL2CAP.Yes
     }
 
     /**
