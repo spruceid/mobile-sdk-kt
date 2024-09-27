@@ -32,8 +32,6 @@ import com.spruceid.mobilesdkexample.navigation.Screen
 import com.spruceid.mobilesdkexample.ui.theme.Inter
 import com.spruceid.mobilesdkexample.ui.theme.TextHeader
 import com.spruceid.mobilesdkexample.ui.theme.Primary
-import com.spruceid.mobilesdkexample.utils.vcs
-import com.spruceid.mobilesdkexample.utils.mdocBase64
 import com.spruceid.mobilesdkexample.viewmodels.IRawCredentialsViewModel
 
 @Composable
@@ -89,19 +87,31 @@ fun WalletHomeHeader(navController: NavController) {
 fun WalletHomeBody(rawCredentialsViewModel: IRawCredentialsViewModel) {
     val rawCredentials by rawCredentialsViewModel.rawCredentials.collectAsState()
 
-    LazyColumn(
-        Modifier
-            .fillMaxWidth()
-            .padding(top = 20.dp)
-    ) {
-        items(rawCredentials) { rawCredential ->
-            AchievementCredentialItem(rawCredential.rawCredential).component()
-        }
+    if(rawCredentials.isNotEmpty()) {
+        LazyColumn(
+            Modifier
+                .fillMaxWidth()
+                .padding(top = 20.dp)
+        ) {
+            items(rawCredentials) { rawCredential ->
+                AchievementCredentialItem(rawCredential.rawCredential).component()
+            }
 //        item {
 //            vcs.map { vc ->
 //                GenericCredentialListItems(vc = vc)
 //            }
 //            ShareableCredentialListItems(mdocBase64 = mdocBase64)
 //        }
+        }
+    } else {
+        Column {
+            Spacer(modifier = Modifier.weight(1f))
+            Image(
+                painter = painterResource(id = R.drawable.empty_wallet),
+                contentDescription = stringResource(id = R.string.user),
+                modifier = Modifier.weight(1f)
+            )
+            Spacer(modifier = Modifier.weight(1f))
+        }
     }
 }

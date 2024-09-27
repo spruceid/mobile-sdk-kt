@@ -12,4 +12,5 @@
     <string name="invalid_check">Invalid credential</string>
     <string name="verification_activity_log">Verification Activity Log</string>
     <string name="chevron">Start action</string>
+    <string name="empty_wallet">No credentials added yet</string>
 </resources>
