@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.spruceid.mobilesdkexample.db.RawCredentials
+import com.spruceid.mobilesdkexample.navigation.Screen
 import com.spruceid.mobilesdkexample.ui.theme.CTAButtonGreen
 import com.spruceid.mobilesdkexample.ui.theme.Inter
 import com.spruceid.mobilesdkexample.ui.theme.MobileSdkTheme
@@ -75,7 +76,10 @@ fun AddToWalletView(
                     rawCredentialsViewModel.saveRawCredential(RawCredentials(
                         rawCredential = rawCredential
                     ))
-                    navController.popBackStack()
+
+                    navController.navigate(Screen.HomeScreen.route) {
+                        popUpTo(0)
+                    }
                 }
             },
             shape = RoundedCornerShape(5.dp),
@@ -119,7 +123,7 @@ fun AddToWalletView(
 @Preview(showBackground = true)
 @Composable
 fun AddToWalletPreview() {
-    var navController: NavHostController = rememberNavController()
+    val navController: NavHostController = rememberNavController()
 
     MobileSdkTheme {
         AddToWalletView(

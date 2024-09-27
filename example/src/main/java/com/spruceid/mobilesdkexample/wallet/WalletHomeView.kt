@@ -97,11 +97,11 @@ fun WalletHomeBody(rawCredentialsViewModel: IRawCredentialsViewModel) {
         items(rawCredentials) { rawCredential ->
             AchievementCredentialItem(rawCredential.rawCredential).component()
         }
-        item {
-            vcs.map { vc ->
-                GenericCredentialListItems(vc = vc)
-            }
-            ShareableCredentialListItems(mdocBase64 = mdocBase64)
-        }
+//        item {
+//            vcs.map { vc ->
+//                GenericCredentialListItems(vc = vc)
+//            }
+//            ShareableCredentialListItems(mdocBase64 = mdocBase64)
+//        }
     }
 }
