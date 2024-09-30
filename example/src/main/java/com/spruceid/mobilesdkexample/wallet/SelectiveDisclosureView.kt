@@ -35,7 +35,7 @@ fun SelectiveDisclosureView(
     onCancel: () -> Unit
 ) {
 
-    val requestData by credentialViewModel.requestData.collectAsState()
+    val itemsRequests by credentialViewModel.itemsRequest.collectAsState()
     val allowedNamespaces by credentialViewModel.allowedNamespaces.collectAsState()
 
     val selectNamespacesSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -56,7 +56,7 @@ fun SelectiveDisclosureView(
                 .padding(all = 12.dp)
                 .verticalScroll(rememberScrollState())
         ) {
-            requestData!!.itemsRequests.map { itemsRequest ->
+            itemsRequests.map { itemsRequest ->
                 Column {
                     Text(
                         text = "Document being requested:\n\t\t${itemsRequest.docType}\n",

@@ -3,12 +3,9 @@ package com.spruceid.mobile.sdk
 import android.bluetooth.BluetoothManager
 import android.util.Log
 import androidx.lifecycle.ViewModel
-import com.spruceid.mobile.sdk.rs.RequestData
-import com.spruceid.mobile.sdk.rs.SessionData
-import com.spruceid.mobile.sdk.rs.handleRequest
-import com.spruceid.mobile.sdk.rs.initialiseSession
-import com.spruceid.mobile.sdk.rs.submitResponse
-import com.spruceid.mobile.sdk.rs.submitSignature
+import com.spruceid.mobile.sdk.rs.ItemsRequest
+import com.spruceid.mobile.sdk.rs.MdlPresentationSession
+import com.spruceid.mobile.sdk.rs.initializeMdlPresentationFromBytes
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import java.security.KeyStore
@@ -23,14 +20,14 @@ class CredentialsViewModel : ViewModel() {
     private val _currState = MutableStateFlow(PresentmentState.UNINITIALIZED)
     val currState = _currState.asStateFlow()
 
-    private val _requestData = MutableStateFlow<RequestData?>(null)
-    val requestData = _requestData.asStateFlow()
-
-    private val _session = MutableStateFlow<SessionData?>(null)
+    private val _session = MutableStateFlow<MdlPresentationSession?>(null)
     val session = _session.asStateFlow()
 
     private val _error = MutableStateFlow<Error?>(null)
     val error = _error.asStateFlow()
+
+    private val _itemsRequests = MutableStateFlow<List<ItemsRequest>>(listOf())
+    val itemsRequest = _itemsRequests.asStateFlow()
 
     private val _allowedNamespaces =
         MutableStateFlow<Map<String, Map<String, List<String>>>>(mapOf())
@@ -68,21 +65,21 @@ class CredentialsViewModel : ViewModel() {
     }
 
     private fun updateRequestData(data: ByteArray) {
-        _requestData.value = handleRequest(_session.value!!.state, data)
+        _itemsRequests.value = _session.value!!.handleRequest(data)
         val namespaces =
-            requestData.value!!.itemsRequests.map { itemsRequest -> itemsRequest.namespaces }
+            _itemsRequests.value.map { itemsRequest -> itemsRequest.namespaces }
         Log.d(
             "CredentialsViewModel.updateRequestData",
-            "Updating requestData: \nitemRequests ${requestData.value!!.itemsRequests.map { itemsRequest -> itemsRequest.docType }} namespaces: $namespaces"
+            "Updating requestData: \nitemRequests ${_itemsRequests.value.map { itemsRequest -> itemsRequest.docType }} namespaces: $namespaces"
         )
         _currState.value = PresentmentState.SELECT_NAMESPACES
     }
 
-    fun present(bluetoothManager: BluetoothManager) {
+    suspend fun present(bluetoothManager: BluetoothManager) {
         Log.d("CredentialsViewModel.present", "Credentials: ${_credentials.value}")
         _uuid.value = UUID.randomUUID()
         val first: MDoc = _credentials.value.first() as MDoc
-        _session.value = initialiseSession(first.inner, _uuid.value.toString())
+        _session.value = initializeMdlPresentationFromBytes(first.inner, _uuid.value.toString())
         _currState.value = PresentmentState.ENGAGING_QR_CODE
         _transport.value = Transport(bluetoothManager)
         _transport.value!!
@@ -91,7 +88,7 @@ class CredentialsViewModel : ViewModel() {
                 _uuid.value,
                 "BLE",
                 "Central",
-                _session.value!!.bleIdent,
+                _session.value!!.getBleIdent(),
                 ::updateRequestData,
                 null
             )
@@ -113,8 +110,7 @@ class CredentialsViewModel : ViewModel() {
             _error.value = e
             throw e
         }
-        val payload = submitResponse(
-            _requestData.value!!.sessionManager,
+        val payload = _session.value!!.generateResponse(
             allowedNamespaces
         )
 
@@ -136,7 +132,7 @@ class CredentialsViewModel : ViewModel() {
             signer.initSign(entry.privateKey)
             signer.update(payload)
             val signature = signer.sign()
-            val response = submitSignature(_requestData.value!!.sessionManager, signature)
+            val response = _session.value!!.submitResponse(signature)
             _transport.value!!.send(response)
             _currState.value = PresentmentState.SUCCESS
         } catch (e: Error) {

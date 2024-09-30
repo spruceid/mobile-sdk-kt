@@ -104,10 +104,10 @@ fun ShareView(
                 }
             }
         PresentmentState.ENGAGING_QR_CODE -> {
-            if (session!!.qrCodeUri.isNotEmpty()) {
+            if (session!!.getQrCodeUri().isNotEmpty()) {
                 Image(
                     painter = rememberQrBitmapPainter(
-                        session!!.qrCodeUri,
+                        session!!.getQrCodeUri(),
                         300.dp,
                     ),
                     contentDescription = "Share QRCode",
