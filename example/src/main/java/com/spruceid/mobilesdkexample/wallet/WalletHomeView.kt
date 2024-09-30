@@ -18,6 +18,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -33,6 +34,7 @@ import com.spruceid.mobilesdkexample.ui.theme.Inter
 import com.spruceid.mobilesdkexample.ui.theme.TextHeader
 import com.spruceid.mobilesdkexample.ui.theme.Primary
 import com.spruceid.mobilesdkexample.viewmodels.IRawCredentialsViewModel
+import kotlinx.coroutines.launch
 
 @Composable
 fun WalletHomeView(
@@ -85,6 +87,8 @@ fun WalletHomeHeader(navController: NavController) {
 
 @Composable
 fun WalletHomeBody(rawCredentialsViewModel: IRawCredentialsViewModel) {
+    val scope = rememberCoroutineScope()
+
     val rawCredentials by rawCredentialsViewModel.rawCredentials.collectAsState()
 
     if(rawCredentials.isNotEmpty()) {
@@ -94,7 +98,14 @@ fun WalletHomeBody(rawCredentialsViewModel: IRawCredentialsViewModel) {
                 .padding(top = 20.dp)
         ) {
             items(rawCredentials) { rawCredential ->
-                AchievementCredentialItem(rawCredential.rawCredential).component()
+                AchievementCredentialItem(
+                    rawCredential.rawCredential,
+                    onDelete = {
+                        scope.launch {
+                            rawCredentialsViewModel.deleteRawCredential(id = rawCredential.id)
+                        }
+                    }
+                ).component()
             }
 //        item {
 //            vcs.map { vc ->
