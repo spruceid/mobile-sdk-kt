@@ -7,18 +7,23 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -47,7 +52,10 @@ fun WalletHomeView(
             .padding(top = 20.dp)
     ) {
         WalletHomeHeader(navController = navController)
-        WalletHomeBody(rawCredentialsViewModel = rawCredentialsViewModel)
+        WalletHomeBody(
+            rawCredentialsViewModel = rawCredentialsViewModel,
+            navController = navController
+        )
     }
 }
 
@@ -86,33 +94,73 @@ fun WalletHomeHeader(navController: NavController) {
 }
 
 @Composable
-fun WalletHomeBody(rawCredentialsViewModel: IRawCredentialsViewModel) {
+fun WalletHomeBody(
+    rawCredentialsViewModel: IRawCredentialsViewModel,
+    navController: NavController
+) {
     val scope = rememberCoroutineScope()
 
     val rawCredentials by rawCredentialsViewModel.rawCredentials.collectAsState()
 
     if(rawCredentials.isNotEmpty()) {
-        LazyColumn(
-            Modifier
-                .fillMaxWidth()
-                .padding(top = 20.dp)
-        ) {
-            items(rawCredentials) { rawCredential ->
-                AchievementCredentialItem(
-                    rawCredential.rawCredential,
-                    onDelete = {
-                        scope.launch {
-                            rawCredentialsViewModel.deleteRawCredential(id = rawCredential.id)
+        Column {
+            LazyColumn(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(top = 20.dp)
+            ) {
+                items(rawCredentials) { rawCredential ->
+                    AchievementCredentialItem(
+                        rawCredential.rawCredential,
+                        onDelete = {
+                            scope.launch {
+                                rawCredentialsViewModel.deleteRawCredential(id = rawCredential.id)
+                            }
                         }
-                    }
-                ).component()
+                    ).component()
+                }
+    //        item {
+    //            vcs.map { vc ->
+    //                GenericCredentialListItems(vc = vc)
+    //            }
+    //            ShareableCredentialListItems(mdocBase64 = mdocBase64)
+    //        }
             }
-//        item {
-//            vcs.map { vc ->
-//                GenericCredentialListItems(vc = vc)
-//            }
-//            ShareableCredentialListItems(mdocBase64 = mdocBase64)
-//        }
+
+            Box(
+                modifier = Modifier.fillMaxSize(), // Fill the entire screen
+                contentAlignment = Alignment.BottomCenter // Align content to the bottom center
+            ) {
+                Button(
+                    onClick = {
+                        navController.navigate(Screen.OID4VPScreen.route)
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.Blue,
+                        contentColor = Color.White,
+                    )
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically, // Align items vertically
+                        modifier = Modifier.padding(8.dp) // Add padding to the button content
+                    ) {
+                        // Add the QR icon here
+                        Icon(
+                            painter = painterResource(id = R.drawable.scan_qr_code), // Replace with your QR code drawable resource
+                            contentDescription = "QR Code Icon", // Accessibility description
+                            tint = Color.White, // Icon color
+                            modifier = Modifier.padding(end = 10.dp) // Space between icon and text
+                        )
+                        Text(
+                            text = "Scan to share",
+                            fontFamily = Inter, // Ensure you have the Inter font available
+                            fontWeight = FontWeight.Normal,
+                            fontSize = 15.sp,
+                        )
+                    }
+                }
+            }
         }
     } else {
         Column {

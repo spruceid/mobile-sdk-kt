@@ -77,7 +77,7 @@ nmcp {
 
 android {
     namespace = "com.spruceid.mobile.sdk"
-    compileSdk = 33
+    compileSdk = 35
 
     defaultConfig {
         minSdk = 26
