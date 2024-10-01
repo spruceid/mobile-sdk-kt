@@ -128,8 +128,8 @@ fun WalletHomeBody(
             }
 
             Box(
-                modifier = Modifier.fillMaxSize(), // Fill the entire screen
-                contentAlignment = Alignment.BottomCenter // Align content to the bottom center
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.BottomCenter
             ) {
                 Button(
                     onClick = {
@@ -142,19 +142,18 @@ fun WalletHomeBody(
                     )
                 ) {
                     Row(
-                        verticalAlignment = Alignment.CenterVertically, // Align items vertically
-                        modifier = Modifier.padding(8.dp) // Add padding to the button content
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.padding(8.dp)
                     ) {
-                        // Add the QR icon here
                         Icon(
-                            painter = painterResource(id = R.drawable.scan_qr_code), // Replace with your QR code drawable resource
-                            contentDescription = "QR Code Icon", // Accessibility description
-                            tint = Color.White, // Icon color
-                            modifier = Modifier.padding(end = 10.dp) // Space between icon and text
+                            painter = painterResource(id = R.drawable.scan_qr_code),
+                            contentDescription = "QR Code Icon",
+                            tint = Color.White,
+                            modifier = Modifier.padding(end = 10.dp)
                         )
                         Text(
                             text = "Scan to share",
-                            fontFamily = Inter, // Ensure you have the Inter font available
+                            fontFamily = Inter,
                             fontWeight = FontWeight.Normal,
                             fontSize = 15.sp,
                         )
