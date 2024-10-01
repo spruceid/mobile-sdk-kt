@@ -14,6 +14,7 @@ abstract class IRawCredentialsViewModel : ViewModel(){
   abstract val rawCredentials: StateFlow<List<RawCredentials>>
   abstract suspend fun saveRawCredential(rawCredential: RawCredentials)
   abstract suspend fun deleteAllRawCredentials()
+  abstract suspend fun deleteRawCredential(id: Long)
   abstract fun generateRawCredentialsCSV(): String
 }
 
@@ -37,6 +38,11 @@ class RawCredentialsViewModel(private val rawCredentialsRepository: RawCredentia
     _rawCredentials.value = rawCredentialsRepository.getRawCredentials()
   }
 
+  override suspend fun deleteRawCredential(id: Long) {
+    rawCredentialsRepository.deleteRawCredential(id = id)
+    _rawCredentials.value = rawCredentialsRepository.getRawCredentials()
+  }
+
   override fun generateRawCredentialsCSV(): String {
     val heading = "ID, Raw Credential\n"
     return heading +
@@ -57,6 +63,8 @@ class RawCredentialsViewModelPreview(override val rawCredentials: StateFlow<List
   override suspend fun saveRawCredential(credential: RawCredentials) {}
 
   override suspend fun deleteAllRawCredentials() {}
+
+  override suspend fun deleteRawCredential(id: Long) {}
 
   override fun generateRawCredentialsCSV(): String {
     return ""

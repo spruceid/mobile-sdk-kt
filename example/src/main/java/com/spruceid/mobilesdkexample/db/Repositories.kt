@@ -33,4 +33,9 @@ class RawCredentialsRepository(private val rawCredentialsDao: RawCredentialsDao)
   suspend fun deleteAllRawCredentials(): Int {
     return rawCredentialsDao.deleteAllRawCredentials()
   }
+
+  @WorkerThread
+  suspend fun deleteRawCredential(id: Long): Int {
+    return rawCredentialsDao.deleteRawCredential(id = id)
+  }
 }

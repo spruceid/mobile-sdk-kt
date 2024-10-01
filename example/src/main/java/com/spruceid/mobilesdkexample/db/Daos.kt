@@ -23,4 +23,7 @@ interface RawCredentialsDao {
 
   @Query("DELETE FROM raw_credentials")
   fun deleteAllRawCredentials(): Int
+
+  @Query("DELETE FROM raw_credentials WHERE id = :id")
+  fun deleteRawCredential(id: Long): Int
 }
