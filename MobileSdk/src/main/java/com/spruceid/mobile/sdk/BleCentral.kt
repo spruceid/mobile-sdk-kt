@@ -56,7 +56,7 @@ class BleCentral(
     /**
      * Starts to scan for devices/peripherals to connect to - looks for a specific service UUID.
      *
-     * Scanning is limited with a timeout to preserve batter life of a device.
+     * Scanning is limited with a timeout to preserve battery life of a device.
      */
     fun scan() {
         val filter: ScanFilter = ScanFilter.Builder()
