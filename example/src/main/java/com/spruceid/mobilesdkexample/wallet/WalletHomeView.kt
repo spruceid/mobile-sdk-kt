@@ -102,7 +102,7 @@ fun WalletHomeBody(
 
     val rawCredentials by rawCredentialsViewModel.rawCredentials.collectAsState()
 
-    if(rawCredentials.isNotEmpty()) {
+    if(!rawCredentials.isNotEmpty()) {
         Column {
             LazyColumn(
                 Modifier

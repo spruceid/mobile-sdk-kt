@@ -14,6 +14,7 @@ import com.spruceid.mobilesdkexample.verifiersettings.VerifierSettingsHomeView
 import com.spruceid.mobilesdkexample.viewmodels.IRawCredentialsViewModel
 import com.spruceid.mobilesdkexample.wallet.AddToWalletView
 import com.spruceid.mobilesdkexample.walletsettings.WalletSettingsHomeView
+import com.spruceid.mobilesdkexample.wallet.ScanOID4VPQR
 
 @Composable
 fun SetupNavGraph(
@@ -73,8 +74,7 @@ fun SetupNavGraph(
                 }
             )
         ) {
-            // val params = backStackEntry.arguments?.getString("params")!!
-            Text(text = "@TODO: OID4VP flow")
+            ScanOID4VPQR(navController)
         }
     }
 }
