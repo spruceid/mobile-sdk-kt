@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.spruceid.mobile.sdk.rs.ItemsRequest
 import com.spruceid.mobile.sdk.rs.MdlPresentationSession
+import com.spruceid.mobile.sdk.rs.ParsedCredential
 import com.spruceid.mobile.sdk.rs.initializeMdlPresentationFromBytes
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -14,7 +15,7 @@ import java.util.UUID
 
 class CredentialsViewModel : ViewModel() {
 
-    private val _credentials = MutableStateFlow<ArrayList<BaseCredential>>(arrayListOf())
+    private val _credentials = MutableStateFlow<ArrayList<ParsedCredential>>(arrayListOf())
     val credentials = _credentials.asStateFlow()
 
     private val _currState = MutableStateFlow(PresentmentState.UNINITIALIZED)
@@ -37,7 +38,7 @@ class CredentialsViewModel : ViewModel() {
 
     private val _transport = MutableStateFlow<Transport?>(null)
 
-    fun storeCredential(credential: BaseCredential) {
+    fun storeCredential(credential: ParsedCredential) {
         _credentials.value.add(credential)
     }
 
