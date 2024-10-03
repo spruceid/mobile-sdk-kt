@@ -102,8 +102,8 @@ fun WalletHomeBody(
 
     val rawCredentials by rawCredentialsViewModel.rawCredentials.collectAsState()
 
-    if(!rawCredentials.isNotEmpty()) {
-        Column {
+    if(rawCredentials.isNotEmpty()) {
+        Box(modifier = Modifier.fillMaxSize()) {
             LazyColumn(
                 Modifier
                     .fillMaxWidth()
@@ -137,7 +137,7 @@ fun WalletHomeBody(
                     },
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.Blue,
+                        containerColor = Color(0xFF488CF4),
                         contentColor = Color.White,
                     )
                 ) {
@@ -146,9 +146,9 @@ fun WalletHomeBody(
                         modifier = Modifier.padding(8.dp)
                     ) {
                         Icon(
-                            painter = painterResource(id = R.drawable.scan_qr_code),
+                            painter = painterResource(id = R.drawable.scan_qr_code_white),
                             contentDescription = "QR Code Icon",
-                            tint = Color.White,
+                            tint = Color(0xFFFFFFFF),
                             modifier = Modifier.padding(end = 10.dp)
                         )
                         Text(
