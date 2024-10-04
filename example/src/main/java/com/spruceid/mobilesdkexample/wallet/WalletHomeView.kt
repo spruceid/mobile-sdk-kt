@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.spruceid.mobilesdkexample.R
 import com.spruceid.mobilesdkexample.navigation.Screen
+import com.spruceid.mobilesdkexample.ui.theme.CTAButtonBlue
 import com.spruceid.mobilesdkexample.ui.theme.Inter
 import com.spruceid.mobilesdkexample.ui.theme.TextHeader
 import com.spruceid.mobilesdkexample.ui.theme.Primary
@@ -108,6 +109,7 @@ fun WalletHomeBody(
                 Modifier
                     .fillMaxWidth()
                     .padding(top = 20.dp)
+                    .padding(bottom = 60.dp)
             ) {
                 items(rawCredentials) { rawCredential ->
                     AchievementCredentialItem(
@@ -137,7 +139,7 @@ fun WalletHomeBody(
                     },
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF488CF4),
+                        containerColor = CTAButtonBlue,
                         contentColor = Color.White,
                     )
                 ) {
@@ -148,7 +150,7 @@ fun WalletHomeBody(
                         Icon(
                             painter = painterResource(id = R.drawable.scan_qr_code_white),
                             contentDescription = "QR Code Icon",
-                            tint = Color(0xFFFFFFFF),
+                            tint = Color.White,
                             modifier = Modifier.padding(end = 10.dp)
                         )
                         Text(
