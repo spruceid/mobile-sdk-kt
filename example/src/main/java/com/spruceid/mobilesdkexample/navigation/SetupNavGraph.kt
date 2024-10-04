@@ -14,7 +14,7 @@ import com.spruceid.mobilesdkexample.verifiersettings.VerifierSettingsHomeView
 import com.spruceid.mobilesdkexample.viewmodels.IRawCredentialsViewModel
 import com.spruceid.mobilesdkexample.wallet.AddToWalletView
 import com.spruceid.mobilesdkexample.walletsettings.WalletSettingsHomeView
-import com.spruceid.mobilesdkexample.wallet.ScanOID4VPQR
+import com.spruceid.mobilesdkexample.wallet.DispatchQRView
 
 @Composable
 fun SetupNavGraph(
@@ -67,14 +67,14 @@ fun SetupNavGraph(
             AddToWalletView(navController, rawCredential, rawCredentialsViewModel)
         }
         composable(
-            route = Screen.OID4VPScreen.route,
+            route = Screen.ScanQRScreen.route,
             deepLinks = listOf(
                 navDeepLink {
                     uriPattern = "oid4vp://{params}"
                 }
             )
         ) {
-            ScanOID4VPQR(navController)
+            DispatchQRView(navController)
         }
     }
 }

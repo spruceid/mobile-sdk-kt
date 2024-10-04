@@ -16,7 +16,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
-fun ScanOID4VPQR(
+fun DispatchQRView(
     navController: NavController
 ) {
     var success by remember {
@@ -28,11 +28,7 @@ fun ScanOID4VPQR(
             // TODO: Add other checks as necessary for validating OID4VP url
             // and handle OID4VP flow
             
-            // success = url.startsWith("oid4vp://")
-            
-            // if (success == false) {
-            //     error("Not a valid OID4VP url.")
-            // }
+            // dispatchQRcode(url)
         }
     }
     

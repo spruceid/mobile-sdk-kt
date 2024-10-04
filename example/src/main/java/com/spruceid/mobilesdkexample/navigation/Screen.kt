@@ -18,5 +18,5 @@ sealed class Screen(val route: String) {
     object VerifierSettingsHomeScreen : Screen(VERIFIER_SETTINGS_HOME_PATH)
     object WalletSettingsHomeScreen : Screen(WALLET_SETTINGS_HOME_PATH)
     object AddToWalletScreen : Screen(ADD_TO_WALLET_PATH)
-    object OID4VPScreen : Screen(OID4VP_PATH)
+    object ScanQRScreen : Screen(OID4VP_PATH)
 }

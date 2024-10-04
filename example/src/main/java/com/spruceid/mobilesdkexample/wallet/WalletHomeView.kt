@@ -135,7 +135,7 @@ fun WalletHomeBody(
             ) {
                 Button(
                     onClick = {
-                        navController.navigate(Screen.OID4VPScreen.route)
+                        navController.navigate(Screen.ScanQRScreen.route)
                     },
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(
