@@ -159,6 +159,7 @@ class TransportBleCentralClientHolder(
         gattClient = GattClient(
             gattClientCallback,
             context,
+            bluetoothAdapter,
             serviceUUID,
             characteristicStateUuid,
             characteristicClient2ServerUuid,
