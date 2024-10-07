@@ -161,7 +161,7 @@ fun VerifierListItem(
                 color = TextHeader,
                 modifier = Modifier.weight(2f)
             )
-            VerifierListItemTag(binary = binary, fields = fields)
+//            VerifierListItemTag(binary = binary, fields = fields)
             Spacer(modifier = Modifier.weight(1f))
             Image(
                 painter = painterResource(id = R.drawable.arrow_right),
