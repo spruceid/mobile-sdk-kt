@@ -44,7 +44,7 @@ fun OID4VCIView(
     navController: NavController
 ) {
     var loading by remember {
-        mutableStateOf<Boolean>(false)
+        mutableStateOf(false)
     }
     var err by remember {
         mutableStateOf<String?>(null)
@@ -132,6 +132,7 @@ fun OID4VCIView(
                 credentials?.forEach { cred ->
                     cred.payload.toString(Charsets.UTF_8).let {
                         credential = it.substring(0, min(1500, it.length))
+                        // TODO: add to credentialPack
                     }
 
                 }
