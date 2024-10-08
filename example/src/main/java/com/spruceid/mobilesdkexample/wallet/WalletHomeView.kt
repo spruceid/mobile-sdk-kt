@@ -33,6 +33,7 @@ import com.spruceid.mobilesdkexample.navigation.Screen
 import com.spruceid.mobilesdkexample.ui.theme.Inter
 import com.spruceid.mobilesdkexample.ui.theme.TextHeader
 import com.spruceid.mobilesdkexample.ui.theme.Primary
+import com.spruceid.mobilesdkexample.utils.mdocBase64
 import com.spruceid.mobilesdkexample.viewmodels.IRawCredentialsViewModel
 import kotlinx.coroutines.launch
 
@@ -62,6 +63,26 @@ fun WalletHomeHeader(navController: NavController) {
             color = TextHeader
         )
         Spacer(Modifier.weight(1f))
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .width(36.dp)
+                .height(36.dp)
+                .padding(start = 4.dp)
+                .clip(shape = RoundedCornerShape(8.dp))
+                .background(Primary)
+                .clickable {
+                    navController.navigate(Screen.OID4VCIScreen.route)
+                }
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.scan_qr_code),
+                contentDescription = stringResource(id = R.string.scan_qr_code),
+                modifier = Modifier
+                    .width(20.dp)
+                    .height(20.dp)
+            )
+        }
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
