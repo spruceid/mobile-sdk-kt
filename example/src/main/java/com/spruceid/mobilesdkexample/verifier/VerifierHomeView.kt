@@ -108,24 +108,24 @@ fun VerifierHomeBody(
             .fillMaxWidth()
             .verticalScroll(rememberScrollState())
     ) {
-        VerifierListItem(
-            title = "Driver's License Document",
-            description = "Verifies physical driver's licenses issued by the state of Utopia",
-            binary = true,
-            fields = 0,
-            modifier = Modifier.clickable {
-                navController.navigate(Screen.VerifyDLScreen.route)
-            }
-        )
-        VerifierListItem(
-            title = "Employment Authorization Document",
-            description = "Verifies physical Employment Authorization issued by the state of Utopia",
-            binary = true,
-            fields = 0,
-            modifier = Modifier.clickable {
-                navController.navigate(Screen.VerifyEAScreen.route)
-            }
-        )
+//        VerifierListItem(
+//            title = "Driver's License Document",
+//            description = "Verifies physical driver's licenses issued by the state of Utopia",
+//            binary = true,
+//            fields = 0,
+//            modifier = Modifier.clickable {
+//                navController.navigate(Screen.VerifyDLScreen.route)
+//            }
+//        )
+//        VerifierListItem(
+//            title = "Employment Authorization Document",
+//            description = "Verifies physical Employment Authorization issued by the state of Utopia",
+//            binary = true,
+//            fields = 0,
+//            modifier = Modifier.clickable {
+//                navController.navigate(Screen.VerifyEAScreen.route)
+//            }
+//        )
         VerifierListItem(
             title = "Verifiable Credential",
             description = "Verifies a verifiable credential by reading the verifiable presentation QR code",
@@ -161,7 +161,7 @@ fun VerifierListItem(
                 color = TextHeader,
                 modifier = Modifier.weight(2f)
             )
-            VerifierListItemTag(binary = binary, fields = fields)
+//            VerifierListItemTag(binary = binary, fields = fields)
             Spacer(modifier = Modifier.weight(1f))
             Image(
                 painter = painterResource(id = R.drawable.arrow_right),
