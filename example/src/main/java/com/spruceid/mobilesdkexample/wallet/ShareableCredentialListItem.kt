@@ -34,9 +34,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.spruceid.mobile.sdk.BaseCredential
 import com.spruceid.mobile.sdk.CredentialPack
 import com.spruceid.mobile.sdk.CredentialsViewModel
+import com.spruceid.mobile.sdk.rs.Mdoc
+import com.spruceid.mobile.sdk.rs.ParsedCredential
 import com.spruceid.mobilesdkexample.R
 import com.spruceid.mobilesdkexample.ui.theme.Bg
 import com.spruceid.mobilesdkexample.ui.theme.CredentialBorder
@@ -46,7 +47,12 @@ import com.spruceid.mobilesdkexample.ui.theme.TextHeader
 import com.spruceid.mobilesdkexample.ui.theme.TextOnPrimary
 import com.spruceid.mobilesdkexample.utils.keyBase64
 import com.spruceid.mobilesdkexample.utils.keyPEM
-import java.util.UUID
+import java.security.KeyFactory
+import java.security.KeyStore
+import java.security.cert.Certificate
+import java.security.cert.CertificateFactory
+import java.security.spec.PKCS8EncodedKeySpec
+import java.util.Base64
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -57,12 +63,50 @@ fun ShareableCredentialListItems(
         CredentialPack()
     }
     val credentials = remember {
-        credentialPack.addMDoc(
-            id = UUID.randomUUID().toString(),
-            mdocBase64 = mdocBase64,
-            keyPEM = keyPEM,
-            keyBase64 = keyBase64
+        val keyAlias = "someAlias"
+
+        val decodedKey = Base64.getDecoder().decode(
+            keyBase64
         )
+
+        val privateKey = KeyFactory.getInstance(
+            "EC"
+        ).generatePrivate(
+            PKCS8EncodedKeySpec(
+                decodedKey
+            )
+        )
+
+        val cert: Array<Certificate> = arrayOf(
+            CertificateFactory.getInstance(
+                "X.509"
+            ).generateCertificate(
+                keyPEM.byteInputStream()
+            )
+        )
+
+        val ks: KeyStore = KeyStore.getInstance(
+            "AndroidKeyStore"
+        )
+
+        ks.load(
+            null
+        )
+
+        ks.setKeyEntry(
+            keyAlias,
+            privateKey,
+            null,
+            cert
+        )
+
+
+        val mdoc = Mdoc.fromCborEncodedDocument(
+            Base64.getDecoder().decode(mdocBase64),
+            keyAlias
+        )
+
+        credentialPack.addMdoc(mdoc)
     }
 
     var sheetOpen by remember {
@@ -127,23 +171,23 @@ fun ShareableCredentialListItems(
 }
 
 @Composable
-fun ShareableCredentialDetailsItem(credential: BaseCredential) {
+fun ShareableCredentialDetailsItem(credential: ParsedCredential) {
     Box(
         Modifier
             .fillMaxWidth()
             .padding(24.dp)
     ) {
-        Text(credential.getId().toString())
+        Text(credential.id())
     }
 }
 
 @Composable
-fun ShareableCredentialListItem(credential: BaseCredential) {
-    Text(credential.getId().toString())
+fun ShareableCredentialListItem(credential: ParsedCredential) {
+    Text(credential.id())
 }
 
 @Composable
-fun ShareableCredentialListItemQRCode(credential: BaseCredential) {
+fun ShareableCredentialListItemQRCode(credential: ParsedCredential) {
     var showQRCode by remember {
         mutableStateOf(false)
     }

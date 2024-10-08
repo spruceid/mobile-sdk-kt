@@ -41,7 +41,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.spruceid.mobile.sdk.CredentialPack
-import com.spruceid.mobile.sdk.W3CVC
+import com.spruceid.mobile.sdk.rs.JsonVc
 import com.spruceid.mobile.sdk.rs.vcToSignedVp
 import com.spruceid.mobile.sdk.ui.BaseCard
 import com.spruceid.mobile.sdk.ui.CardRenderingDetailsField
@@ -64,10 +64,10 @@ import com.spruceid.mobilesdkexample.utils.small_vc
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GenericCredentialListItems(
-    vc: String
+    vc_json: String
 ) {
     val credentialPack = CredentialPack()
-    credentialPack.addW3CVC(credentialString = vc)
+    credentialPack.addJsonVc(JsonVc.newFromJson(vc_json))
 
     var sheetOpen by remember {
         mutableStateOf(false)
@@ -161,7 +161,10 @@ fun GenericCredentialDetailsItem(credentialPack: CredentialPack) {
                 ),
                 formatter = {values ->
                     val w3cvc = values.toList()
-                        .first { credentialPack.getCredentialById(it.first)!! is W3CVC  }.second
+                        .first { (key, _) ->
+                            val credential = credentialPack.getCredentialById(key)
+                            (credential?.asJwtVc() != null || credential?.asJsonVc() != null)
+                        }.second
 
                     var portrait = ""
                     var firstName = ""
@@ -253,7 +256,10 @@ fun GenericCredentialDetailsItem(credentialPack: CredentialPack) {
                 keys = listOf("issuanceDate"),
                 formatter = { values ->
                     val w3cvc = values.toList()
-                        .first { credentialPack.getCredentialById(it.first)!! is W3CVC  }.second
+                        .first { (key, _) ->
+                            val credential = credentialPack.getCredentialById(key)
+                            (credential?.asJwtVc() != null || credential?.asJsonVc() != null)
+                        }.second
 
                     Row {
                         Column {
@@ -293,7 +299,10 @@ fun GenericCredentialListItem(credentialPack: CredentialPack) {
         titleKeys = listOf("name"),
         titleFormatter = {values ->
             val w3cvc = values.toList()
-                .first { credentialPack.getCredentialById(it.first)!! is W3CVC  }.second
+                .first { (key, _) ->
+                    val credential = credentialPack.getCredentialById(key)
+                    (credential?.asJwtVc() != null || credential?.asJsonVc() != null)
+                }.second
 
             Text(
                 text = w3cvc["name"].toString(),
@@ -307,7 +316,10 @@ fun GenericCredentialListItem(credentialPack: CredentialPack) {
         descriptionKeys = listOf("description", "valid"),
         descriptionFormatter = {values ->
             val w3cvc = values.toList()
-                .first { credentialPack.getCredentialById(it.first)!! is W3CVC  }.second
+                .first { (key, _) ->
+                    val credential = credentialPack.getCredentialById(key)
+                    (credential?.asJwtVc() != null || credential?.asJsonVc() != null)
+                }.second
 
             Column {
                 Text(
@@ -339,7 +351,10 @@ fun GenericCredentialListItem(credentialPack: CredentialPack) {
         leadingIconKeys = listOf("issuer.image", "issuer.name"),
         leadingIconFormatter = { values ->
             val w3cvc = values.toList()
-                .first { credentialPack.getCredentialById(it.first)!! is W3CVC  }.second
+                .first { (key, _) ->
+                    val credential = credentialPack.getCredentialById(key)
+                    (credential?.asJwtVc() != null || credential?.asJsonVc() != null)
+                }.second
             val byteArray = Base64.decode(
                 w3cvc["issuer.image"]
                     .toString()
