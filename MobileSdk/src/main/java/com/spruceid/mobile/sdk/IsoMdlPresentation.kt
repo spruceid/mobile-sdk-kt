@@ -4,6 +4,7 @@ import android.bluetooth.BluetoothManager
 import android.util.Log
 import com.spruceid.mobile.sdk.rs.ItemsRequest
 import com.spruceid.mobile.sdk.rs.MdlPresentationSession
+import com.spruceid.mobile.sdk.rs.Mdoc
 import com.spruceid.mobile.sdk.rs.RequestException
 import com.spruceid.mobile.sdk.rs.initializeMdlPresentationFromBytes
 import java.security.KeyStore
@@ -16,7 +17,7 @@ abstract class BLESessionStateDelegate {
 }
 
 class IsoMdlPresentation(
-    val mdoc: MDoc,
+    val mdoc: Mdoc,
     val keyAlias: String,
     val bluetoothManager: BluetoothManager,
     val callback: BLESessionStateDelegate
@@ -28,7 +29,7 @@ class IsoMdlPresentation(
 
     suspend fun initialize() {
         try {
-            session = initializeMdlPresentationFromBytes(this.mdoc.inner, uuid.toString())
+            session = initializeMdlPresentationFromBytes(this.mdoc, uuid.toString())
             this.bleManager = Transport(this.bluetoothManager)
             this.bleManager!!
                 .initialize(

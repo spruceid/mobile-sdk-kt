@@ -109,7 +109,7 @@ fun WalletHomeBody(rawCredentialsViewModel: IRawCredentialsViewModel) {
             }
 //        item {
 //            vcs.map { vc ->
-//                GenericCredentialListItems(vc = vc)
+//                GenericCredentialListItems(vc_json = vc)
 //            }
 //            ShareableCredentialListItems(mdocBase64 = mdocBase64)
 //        }
