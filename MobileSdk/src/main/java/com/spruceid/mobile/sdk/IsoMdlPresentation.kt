@@ -78,6 +78,10 @@ class IsoMdlPresentation(
         }
     }
 
+    fun terminate() {
+        this.bleManager!!.terminate()
+    }
+
     fun updateRequestData(data: ByteArray) {
         try {
             this.itemsRequests = session!!.handleRequest(data)
