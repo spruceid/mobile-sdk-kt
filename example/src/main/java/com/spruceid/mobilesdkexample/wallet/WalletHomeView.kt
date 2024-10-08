@@ -55,10 +55,10 @@ fun WalletHomeView(
 fun WalletHomeHeader(navController: NavController) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         Text(
-            text = "Spruce Wallet",
+            text = "SpruceKit Demo Wallet",
             fontFamily = Inter,
             fontWeight = FontWeight.SemiBold,
-            fontSize = 24.sp,
+            fontSize = 20.sp,
             color = TextHeader
         )
         Spacer(Modifier.weight(1f))
