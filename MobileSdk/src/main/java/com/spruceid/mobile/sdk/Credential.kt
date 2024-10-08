@@ -3,6 +3,7 @@ package com.spruceid.mobile.sdk
 import com.spruceid.mobile.sdk.rs.JsonVc
 import com.spruceid.mobile.sdk.rs.JwtVc
 import com.spruceid.mobile.sdk.rs.Mdoc
+import org.json.JSONArray
 import org.json.JSONObject
 
 /**
@@ -32,14 +33,21 @@ private fun Mdoc.jsonEncodedDetailsInternal(elementIdentifiers: List<String>?): 
                 }
 
                 if (jsonString != null) {
-                    val json: JSONObject
+                    val jsonObject: JSONObject
                     try {
-                        json = JSONObject(jsonString)
-                    } catch (e: Error) {
+                        jsonObject = JSONObject(jsonString)
+                        return@map Pair(id, jsonObject)
+                    } catch (e: Exception) {
                         print("failed to decode '$id' as JSON: $e")
-                        return@map null
                     }
-                    return@map Pair(id, json)
+
+                    try {
+                        val jsonArray = JSONArray(jsonString)
+                        return@map Pair(id, jsonArray)
+                    } catch (e: Exception) {
+                        print("failed to decode '$id' as JSON: $e")
+                        return@map Pair(id, jsonString)
+                    }
                 }
 
                 return@map null
@@ -67,7 +75,7 @@ fun JwtVc.credentialClaimsFiltered(claimNames: List<String>): JSONObject {
     val new = JSONObject()
     for (name in claimNames) {
         if (old.has(name)) {
-            new.put(name, old.get(name))
+            new.put(name, keyPathFinder(old, name.split(".").toMutableList()))
         }
     }
     return new
@@ -92,9 +100,21 @@ fun JsonVc.credentialClaimsFiltered(claimNames: List<String>): JSONObject {
     val old = this.credentialClaims()
     val new = JSONObject()
     for (name in claimNames) {
-        if (old.has(name)) {
-            new.put(name, old.get(name))
-        }
+        new.put(name, keyPathFinder(old, name.split(".").toMutableList()))
     }
     return new
+}
+
+private fun keyPathFinder(json: Any, path: MutableList<String>): Any {
+    try {
+        val firstKey = path.first()
+        val element = (json as JSONObject)[firstKey]
+        path.removeAt(0)
+        if (path.isNotEmpty()) {
+            return keyPathFinder(element, path)
+        }
+        return element
+    } catch (e: Exception) {
+        return ""
+    }
 }

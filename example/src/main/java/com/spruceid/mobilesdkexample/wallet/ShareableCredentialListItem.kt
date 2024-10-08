@@ -221,7 +221,7 @@ fun ShareableCredentialListItemQRCode(credential: ParsedCredential) {
                 .fillMaxWidth()
                 .clickable {
                     showQRCode = !showQRCode
-                    if(!showQRCode) {
+                    if (!showQRCode) {
                         credentialViewModel.cancel()
                     }
                 }
@@ -242,7 +242,7 @@ fun ShareableCredentialListItemQRCode(credential: ParsedCredential) {
         }
 
         AnimatedVisibility(visible = showQRCode) {
-            if(showQRCode) {
+            if (showQRCode) {
                 Column(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally
