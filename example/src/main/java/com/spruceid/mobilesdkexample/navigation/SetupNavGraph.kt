@@ -13,6 +13,7 @@ import com.spruceid.mobilesdkexample.verifier.VerifyVCView
 import com.spruceid.mobilesdkexample.verifiersettings.VerifierSettingsHomeView
 import com.spruceid.mobilesdkexample.viewmodels.IRawCredentialsViewModel
 import com.spruceid.mobilesdkexample.wallet.AddToWalletView
+import com.spruceid.mobilesdkexample.wallet.OID4VCIView
 import com.spruceid.mobilesdkexample.walletsettings.WalletSettingsHomeView
 import com.spruceid.mobilesdkexample.wallet.DispatchQRView
 
@@ -75,6 +76,11 @@ fun SetupNavGraph(
             )
         ) {
             DispatchQRView(navController)
+        }
+        composable(
+            route = Screen.OID4VCIScreen.route,
+        ) {
+            OID4VCIView(navController)
         }
     }
 }
