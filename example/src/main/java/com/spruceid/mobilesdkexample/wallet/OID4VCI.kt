@@ -25,6 +25,7 @@ import com.spruceid.mobile.sdk.rs.HttpResponse
 import com.spruceid.mobile.sdk.rs.Oid4vci
 import com.spruceid.mobile.sdk.rs.generatePopComplete
 import com.spruceid.mobile.sdk.rs.generatePopPrepare
+import com.spruceid.mobilesdkexample.LoadingView
 import com.spruceid.mobilesdkexample.R
 import com.spruceid.mobilesdkexample.ScanningComponent
 import com.spruceid.mobilesdkexample.ScanningType
@@ -145,13 +146,7 @@ fun OID4VCIView(
     }
 
     if (loading) {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text("Loading...")
-        }
+        LoadingView(loadingText = "Loading...")
     } else if (err != null) {
         Column(
             modifier = Modifier.fillMaxSize(),
