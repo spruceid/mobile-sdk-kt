@@ -15,6 +15,7 @@ import com.spruceid.mobilesdkexample.viewmodels.IRawCredentialsViewModel
 import com.spruceid.mobilesdkexample.wallet.AddToWalletView
 import com.spruceid.mobilesdkexample.wallet.OID4VCIView
 import com.spruceid.mobilesdkexample.walletsettings.WalletSettingsHomeView
+import com.spruceid.mobilesdkexample.wallet.DispatchQRView
 
 @Composable
 fun SetupNavGraph(
@@ -67,15 +68,14 @@ fun SetupNavGraph(
             AddToWalletView(navController, rawCredential, rawCredentialsViewModel)
         }
         composable(
-            route = Screen.OID4VPScreen.route,
+            route = Screen.ScanQRScreen.route,
             deepLinks = listOf(
                 navDeepLink {
                     uriPattern = "oid4vp://{params}"
                 }
             )
         ) {
-            // val params = backStackEntry.arguments?.getString("params")!!
-            Text(text = "@TODO: OID4VP flow")
+            DispatchQRView(navController)
         }
         composable(
             route = Screen.OID4VCIScreen.route,
