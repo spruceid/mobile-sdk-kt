@@ -68,6 +68,8 @@ dependencies {
     implementation("androidx.compose.material3:material3")
     implementation("androidx.navigation:navigation-compose:2.7.7")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.4")
+    implementation("app.rive:rive-android:8.7.0")
+    implementation("androidx.startup:startup-runtime:1.1.1")
     implementation(project(mapOf("path" to ":MobileSdk")))
     implementation("com.google.zxing:core:3.5.1")
     implementation("io.ktor:ktor-client-core:2.3.12")

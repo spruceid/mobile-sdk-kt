@@ -20,4 +20,5 @@
     <color name="spruce_blue">#FF2F6AE1</color>
     <color name="secondary_button_red">#FFE11D48</color>
     <color name="cta_button_green">#FF087455</color>
+    <color name="color_base_800">#FF75675C</color>
 </resources>
