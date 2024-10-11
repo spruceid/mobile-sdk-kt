@@ -12,8 +12,8 @@ android {
         applicationId = "com.spruceid.mobilesdkexample"
         minSdk = 26
         targetSdk = 34
-        versionCode = 5
-        versionName = "1.0.0+5"
+        versionCode = 7
+        versionName = "1.0.0+7"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -68,8 +68,12 @@ dependencies {
     implementation("androidx.compose.material3:material3")
     implementation("androidx.navigation:navigation-compose:2.7.7")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.4")
+    implementation("app.rive:rive-android:8.7.0")
+    implementation("androidx.startup:startup-runtime:1.1.1")
     implementation(project(mapOf("path" to ":MobileSdk")))
     implementation("com.google.zxing:core:3.5.1")
+    implementation("io.ktor:ktor-client-core:2.3.12")
+    implementation("io.ktor:ktor-client-cio:2.3.12")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")

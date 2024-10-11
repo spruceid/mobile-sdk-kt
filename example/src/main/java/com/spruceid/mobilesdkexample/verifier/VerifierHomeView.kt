@@ -61,10 +61,10 @@ fun VerifierHomeHeader(
 ) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         Text(
-            text = "Spruce Verifier",
+            text = "SpruceKit Demo Verifier",
             fontFamily = Inter,
             fontWeight = FontWeight.SemiBold,
-            fontSize = 24.sp,
+            fontSize = 20.sp,
             color = TextHeader
         )
         Spacer(Modifier.weight(1f))

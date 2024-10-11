@@ -80,8 +80,8 @@ nmcp {
 }
 
 android {
-  namespace = "com.spruceid.mobile.sdk"
-  compileSdk = 33
+    namespace = "com.spruceid.mobile.sdk"
+    compileSdk = 35
 
   defaultConfig {
     minSdk = 26
@@ -120,7 +120,7 @@ android {
 }
 
 dependencies {
-  api("com.spruceid.mobile.sdk.rs:mobilesdkrs:0.0.33")
+  api("com.spruceid.mobile.sdk.rs:mobilesdkrs:0.0.36")
   //noinspection GradleCompatible
   implementation("com.android.support:appcompat-v7:28.0.0")
   /* Begin UI dependencies */
