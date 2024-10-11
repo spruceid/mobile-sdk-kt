@@ -3,8 +3,9 @@ package com.spruceid.mobile.sdk
 import com.spruceid.mobile.sdk.rs.JsonVc
 import com.spruceid.mobile.sdk.rs.JwtVc
 import com.spruceid.mobile.sdk.rs.Mdoc
-import org.json.JSONArray
+import org.json.JSONException
 import org.json.JSONObject
+import org.json.JSONTokener
 
 /**
  * Access all of the elements in the mdoc, ignoring namespaces and missing elements that cannot be encoded as JSON.
@@ -33,20 +34,11 @@ private fun Mdoc.jsonEncodedDetailsInternal(elementIdentifiers: List<String>?): 
                 }
 
                 if (jsonString != null) {
-                    val jsonObject: JSONObject
                     try {
-                        jsonObject = JSONObject(jsonString)
-                        return@map Pair(id, jsonObject)
-                    } catch (e: Exception) {
+                        val jsonElement = JSONTokener(jsonString).nextValue()
+                        return@map Pair(id, jsonElement)
+                    } catch (e: JSONException) {
                         print("failed to decode '$id' as JSON: $e")
-                    }
-
-                    try {
-                        val jsonArray = JSONArray(jsonString)
-                        return@map Pair(id, jsonArray)
-                    } catch (e: Exception) {
-                        print("failed to decode '$id' as JSON: $e")
-                        return@map Pair(id, jsonString)
                     }
                 }
 
