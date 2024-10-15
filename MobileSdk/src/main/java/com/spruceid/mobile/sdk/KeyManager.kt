@@ -304,7 +304,7 @@ class KeyManager {
      * @property payload to be encrypted.
      * @return the decrypted payload.
      */
-    fun decryptPayload(id: String, iv: ByteArray, payload: ByteArray): ByteArray? {
+    fun decryptPayload(id: String, iv: ByteArray, payload: ByteArray): ByteArray {
         val secretKey = getSecretKey(id)
         val cipher = Cipher.getInstance("AES/GCM/NoPadding")
         val spec = GCMParameterSpec(128, iv)
