@@ -39,7 +39,6 @@ import com.spruceid.mobilesdkexample.ui.theme.CTAButtonBlue
 import com.spruceid.mobilesdkexample.ui.theme.Inter
 import com.spruceid.mobilesdkexample.ui.theme.TextHeader
 import com.spruceid.mobilesdkexample.ui.theme.Primary
-import com.spruceid.mobilesdkexample.utils.mdocBase64
 import com.spruceid.mobilesdkexample.viewmodels.IRawCredentialsViewModel
 import kotlinx.coroutines.launch
 

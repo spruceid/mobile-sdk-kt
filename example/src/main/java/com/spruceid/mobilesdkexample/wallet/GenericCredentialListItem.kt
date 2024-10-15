@@ -41,7 +41,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.spruceid.mobile.sdk.CredentialPack
-import com.spruceid.mobile.sdk.W3CVC
+import com.spruceid.mobile.sdk.rs.JsonVc
 import com.spruceid.mobile.sdk.rs.vcToSignedVp
 import com.spruceid.mobile.sdk.ui.BaseCard
 import com.spruceid.mobile.sdk.ui.CardRenderingDetailsField
@@ -64,10 +64,10 @@ import com.spruceid.mobilesdkexample.utils.small_vc
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GenericCredentialListItems(
-    vc: String
+    vc_json: String
 ) {
     val credentialPack = CredentialPack()
-    credentialPack.addW3CVC(credentialString = vc)
+    credentialPack.addJsonVc(JsonVc.newFromJson(vc_json))
 
     var sheetOpen by remember {
         mutableStateOf(false)
@@ -149,6 +149,7 @@ fun GenericCredentialDetailsItem(credentialPack: CredentialPack) {
             CardRenderingDetailsField(
                 // it's also possible just request the credentialSubject and cast it to JSONObject
                 keys = listOf(
+                    "issuer.name",
                     "credentialSubject.image",
                     "credentialSubject.givenName",
                     "credentialSubject.familyName",
@@ -159,15 +160,14 @@ fun GenericCredentialDetailsItem(credentialPack: CredentialPack) {
                     "credentialSubject.driversLicense.family_name",
                     "credentialSubject.driversLicense.birth_date",
                 ),
-                formatter = {values ->
-                    val w3cvc = values.toList()
-                        .first { credentialPack.getCredentialById(it.first)!! is W3CVC  }.second
+                formatter = { values ->
+                    val w3cvc = values.toList().first().second
 
                     var portrait = ""
                     var firstName = ""
                     var lastName = ""
                     var birthDate = ""
-                    if(w3cvc["credentialSubject.driversLicense"].toString().isNotEmpty()) {
+                    if (w3cvc["credentialSubject.driversLicense"].toString().isNotEmpty()) {
                         portrait = w3cvc["credentialSubject.driversLicense.portrait"].toString()
                         firstName = w3cvc["credentialSubject.driversLicense.given_name"].toString()
                         lastName = w3cvc["credentialSubject.driversLicense.family_name"].toString()
@@ -201,7 +201,7 @@ fun GenericCredentialDetailsItem(credentialPack: CredentialPack) {
                             )
                             BitmapImage(
                                 byteArray,
-                                contentDescription =  w3cvc["issuer.name"].toString(),
+                                contentDescription = w3cvc["issuer.name"].toString(),
                                 modifier = Modifier
                                     .width(90.dp)
                                     .padding(end = 12.dp)
@@ -252,8 +252,7 @@ fun GenericCredentialDetailsItem(credentialPack: CredentialPack) {
             CardRenderingDetailsField(
                 keys = listOf("issuanceDate"),
                 formatter = { values ->
-                    val w3cvc = values.toList()
-                        .first { credentialPack.getCredentialById(it.first)!! is W3CVC  }.second
+                    val w3cvc = values.toList().first().second
 
                     Row {
                         Column {
@@ -291,9 +290,8 @@ fun GenericCredentialDetailsItem(credentialPack: CredentialPack) {
 fun GenericCredentialListItem(credentialPack: CredentialPack) {
     val listRendering = CardRenderingListView(
         titleKeys = listOf("name"),
-        titleFormatter = {values ->
-            val w3cvc = values.toList()
-                .first { credentialPack.getCredentialById(it.first)!! is W3CVC  }.second
+        titleFormatter = { values ->
+            val w3cvc = values.toList().first().second
 
             Text(
                 text = w3cvc["name"].toString(),
@@ -305,9 +303,8 @@ fun GenericCredentialListItem(credentialPack: CredentialPack) {
             )
         },
         descriptionKeys = listOf("description", "valid"),
-        descriptionFormatter = {values ->
-            val w3cvc = values.toList()
-                .first { credentialPack.getCredentialById(it.first)!! is W3CVC  }.second
+        descriptionFormatter = { values ->
+            val w3cvc = values.toList().first().second
 
             Column {
                 Text(
@@ -318,7 +315,7 @@ fun GenericCredentialListItem(credentialPack: CredentialPack) {
                     color = TextBody
                 )
                 Spacer(modifier = Modifier.height(16.dp))
-                if(w3cvc["valid"].toString() == "true") {
+                if (w3cvc["valid"].toString() == "true") {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Image(
                             painter = painterResource(id = R.drawable.valid),
@@ -338,8 +335,7 @@ fun GenericCredentialListItem(credentialPack: CredentialPack) {
         },
         leadingIconKeys = listOf("issuer.image", "issuer.name"),
         leadingIconFormatter = { values ->
-            val w3cvc = values.toList()
-                .first { credentialPack.getCredentialById(it.first)!! is W3CVC  }.second
+            val w3cvc = values.toList().first().second
             val byteArray = Base64.decode(
                 w3cvc["issuer.image"]
                     .toString()
@@ -355,7 +351,7 @@ fun GenericCredentialListItem(credentialPack: CredentialPack) {
             ) {
                 BitmapImage(
                     byteArray,
-                    contentDescription =  w3cvc["issuer.name"].toString(),
+                    contentDescription = w3cvc["issuer.name"].toString(),
                     modifier = Modifier
                         .width(50.dp)
                         .padding(end = 12.dp)
@@ -424,7 +420,7 @@ fun GenericCredentialListItemQRCode() {
                 modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                if(vc != null) {
+                if (vc != null) {
                     Image(
                         painter = rememberQrBitmapPainter(vc!!, size = 300.dp),
                         contentDescription = stringResource(id = R.string.vp_qr_code),

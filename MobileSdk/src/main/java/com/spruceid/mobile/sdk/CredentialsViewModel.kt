@@ -5,16 +5,19 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.spruceid.mobile.sdk.rs.ItemsRequest
 import com.spruceid.mobile.sdk.rs.MdlPresentationSession
+import com.spruceid.mobile.sdk.rs.Mdoc
+import com.spruceid.mobile.sdk.rs.ParsedCredential
 import com.spruceid.mobile.sdk.rs.initializeMdlPresentationFromBytes
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
 import java.security.KeyStore
 import java.security.Signature
 import java.util.UUID
 
 class CredentialsViewModel : ViewModel() {
 
-    private val _credentials = MutableStateFlow<ArrayList<BaseCredential>>(arrayListOf())
+    private val _credentials = MutableStateFlow<ArrayList<ParsedCredential>>(arrayListOf())
     val credentials = _credentials.asStateFlow()
 
     private val _currState = MutableStateFlow(PresentmentState.UNINITIALIZED)
@@ -37,8 +40,18 @@ class CredentialsViewModel : ViewModel() {
 
     private val _transport = MutableStateFlow<Transport?>(null)
 
-    fun storeCredential(credential: BaseCredential) {
+    fun storeCredential(credential: ParsedCredential) {
         _credentials.value.add(credential)
+    }
+
+    private fun firstMdoc(): Mdoc  {
+        val mdoc = _credentials.value
+            .map { credential -> credential.asMsoMdoc() }
+            .firstOrNull()
+        if (mdoc == null) {
+            throw Exception("no mdoc found")
+        }
+        return mdoc
     }
 
     fun toggleAllowedNamespace(docType: String, specName: String, fieldName: String) {
@@ -78,8 +91,8 @@ class CredentialsViewModel : ViewModel() {
     suspend fun present(bluetoothManager: BluetoothManager) {
         Log.d("CredentialsViewModel.present", "Credentials: ${_credentials.value}")
         _uuid.value = UUID.randomUUID()
-        val first: MDoc = _credentials.value.first() as MDoc
-        _session.value = initializeMdlPresentationFromBytes(first.inner, _uuid.value.toString())
+        val mdoc = this.firstMdoc()
+        _session.value = initializeMdlPresentationFromBytes(mdoc, _uuid.value.toString())
         _currState.value = PresentmentState.ENGAGING_QR_CODE
         _transport.value = Transport(bluetoothManager)
         _transport.value!!
@@ -102,7 +115,7 @@ class CredentialsViewModel : ViewModel() {
     }
 
     fun submitNamespaces(allowedNamespaces: Map<String, Map<String, List<String>>>) {
-        val firstMDoc: MDoc = _credentials.value.first() as MDoc
+        val mdoc = this.firstMdoc()
         if(allowedNamespaces.isEmpty()) {
             val e = Error("Select at least one namespace")
             Log.e("CredentialsViewModel.submitNamespaces", e.toString())
@@ -122,9 +135,9 @@ class CredentialsViewModel : ViewModel() {
             null
         )
 
-        val entry = ks.getEntry(firstMDoc.keyAlias, null)
+        val entry = ks.getEntry(mdoc.keyAlias(), null)
         if (entry !is KeyStore.PrivateKeyEntry) {
-            throw IllegalStateException("No such private key under the alias <${firstMDoc.keyAlias}>")
+            throw IllegalStateException("No such private key under the alias <${mdoc.keyAlias()}>")
         }
 
         try {

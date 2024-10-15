@@ -1,108 +1,98 @@
 package com.spruceid.mobile.sdk
 
-import java.security.KeyFactory
-import java.security.KeyStore
-import java.security.cert.Certificate
-import java.security.cert.CertificateFactory
-import java.security.spec.PKCS8EncodedKeySpec
-import java.util.Base64
+import com.spruceid.mobile.sdk.rs.JsonVc
+import com.spruceid.mobile.sdk.rs.JwtVc
+import com.spruceid.mobile.sdk.rs.Mdoc
+import com.spruceid.mobile.sdk.rs.ParsedCredential
+import org.json.JSONObject
 
 /**
  * Collection of BaseCredentials with methods to interact with all instances
  */
 class CredentialPack {
-    private val credentials: MutableList<BaseCredential>
+    private val credentials: MutableList<ParsedCredential>
 
     constructor() {
         credentials = mutableListOf()
     }
 
-    constructor(credentialsArray: MutableList<BaseCredential>) {
+    constructor(credentialsArray: MutableList<ParsedCredential>) {
         this.credentials = credentialsArray
     }
 
-    fun addW3CVC(credentialString: String): List<BaseCredential> {
-        val vc = W3CVC(credentialString = credentialString)
-        credentials.add(vc)
+    /**
+     * Add a JwtVc to the CredentialPack.
+     */
+    fun addJwtVc(jwtVc: JwtVc): List<ParsedCredential> {
+        credentials.add(ParsedCredential.newJwtVcJson(jwtVc))
         return credentials
     }
 
-    fun addMDoc(
-        id: String,
-        mdocBase64: String,
-        keyPEM: String,
-        keyBase64: String
-    ): List<BaseCredential> {
-        try {
-            val decodedKey = Base64.getDecoder().decode(
-                keyBase64
-            )
-
-            val privateKey = KeyFactory.getInstance(
-                "EC"
-            ).generatePrivate(
-                PKCS8EncodedKeySpec(
-                    decodedKey
-                )
-            )
-
-            val cert: Array<Certificate> = arrayOf(
-                CertificateFactory.getInstance(
-                    "X.509"
-                ).generateCertificate(
-                    keyPEM.byteInputStream()
-                )
-            )
-
-            val ks: KeyStore = KeyStore.getInstance(
-                "AndroidKeyStore"
-            )
-
-            ks.load(
-                null
-            )
-
-            ks.setKeyEntry(
-                "someAlias",
-                privateKey,
-                null,
-                cert
-            )
-
-            credentials.add(
-                MDoc(
-                    id,
-                    Base64.getDecoder().decode(mdocBase64),
-                    "someAlias"
-                )
-            )
-        } catch (e: Throwable) {
-            print(
-                e
-            )
-            throw e
-        }
+    /**
+     * Add a JsonVc to the CredentialPack.
+     */
+    fun addJsonVc(jsonVc: JsonVc): List<ParsedCredential> {
+        credentials.add(ParsedCredential.newLdpVc(jsonVc))
         return credentials
     }
 
-    fun get(keys: List<String>): Map<String, Map<String, Any>> {
-        val values = emptyMap<String, Map<String, Any>>().toMutableMap()
-
-        for (credential in credentials) {
-            values[credential.getId()!!] = credential.get(keys)
-        }
-        return values
-    }
-
-    fun getCredentialsByIds(credentialsIds: List<String>): List<BaseCredential> {
-        return credentials.filter { credential -> credentialsIds.contains(credential.getId()) }
-    }
-
-    fun getCredentials(): List<BaseCredential> {
+    /**
+     * Add an Mdoc to the CredentialPack.
+     */
+    fun addMdoc(mdoc: Mdoc): List<ParsedCredential> {
+        credentials.add(ParsedCredential.newMsoMdoc(mdoc))
         return credentials
     }
 
-    fun getCredentialById(credentialId: String): BaseCredential? {
-        return credentials.find { credential -> credential.getId().equals(credentialId) }
-    }
+    /**
+     *  Find claims from all credentials in this CredentialPack.
+     */
+    fun findCredentialClaims(claimNames: List<String>): Map<String, JSONObject> =
+        this.list()
+            .map { credential ->
+                var claims: JSONObject
+                val mdoc = credential.asMsoMdoc()
+                val jwtVc = credential.asJwtVc()
+                val jsonVc = credential.asJsonVc()
+
+                if (mdoc != null) {
+                    claims = mdoc.jsonEncodedDetailsFiltered(claimNames)
+                } else if (jwtVc != null) {
+                    claims = jwtVc.credentialClaimsFiltered(claimNames)
+                } else if (jsonVc != null) {
+                    claims = jsonVc.credentialClaimsFiltered(claimNames)
+                } else {
+                    var type: String
+                    try {
+                        type = credential.intoGenericForm().type
+                    } catch (e: Error) {
+                        type = "unknown"
+                    }
+                    print("unsupported credential type: $type")
+                    claims = JSONObject()
+                }
+
+                return@map Pair(credential.id(), claims)
+            }
+            .toMap()
+
+
+    /**
+     * Get credentials by id.
+     */
+    fun getCredentialsByIds(credentialsIds: List<String>): List<ParsedCredential> =
+        this.list().filter { credential -> credentialsIds.contains(credential.id()) }
+
+
+    /**
+     * Get a credential by id.
+     */
+    fun getCredentialById(credentialId: String): ParsedCredential? =
+        this.list().find { credential -> credential.id() == credentialId }
+
+
+    /**
+     * List all of the credentials in the CredentialPack.
+     */
+    fun list(): List<ParsedCredential> = this.credentials
 }

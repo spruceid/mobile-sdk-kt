@@ -9,6 +9,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.spruceid.mobile.sdk.CredentialPack
+import org.json.JSONObject
 
 /**
  * Data class with the specification to display the credential pack in a list view
@@ -23,13 +24,13 @@ import com.spruceid.mobile.sdk.CredentialPack
  */
 data class CardRenderingListView(
     val titleKeys: List<String>,
-    val titleFormatter: @Composable ((values: Map<String, Map<String, Any>>) -> Unit)? = null,
+    val titleFormatter: @Composable ((values: Map<String, JSONObject>) -> Unit)? = null,
     val descriptionKeys: List<String>? = null,
-    val descriptionFormatter: @Composable ((values: Map<String, Map<String, Any>>) -> Unit)? = null,
+    val descriptionFormatter: @Composable ((values: Map<String, JSONObject>) -> Unit)? = null,
     val leadingIconKeys: List<String>? = null,
-    val leadingIconFormatter: @Composable ((values: Map<String, Map<String, Any>>) -> Unit)? = null,
+    val leadingIconFormatter: @Composable ((values: Map<String, JSONObject>) -> Unit)? = null,
     val trailingActionKeys: List<String>? = null,
-    val trailingActionButton: @Composable ((values: Map<String, Map<String, Any>>) -> Unit)? = null
+    val trailingActionButton: @Composable ((values: Map<String, JSONObject>) -> Unit)? = null
 )
 
 /**
@@ -39,7 +40,7 @@ data class CardRenderingListView(
  */
 data class CardRenderingDetailsField(
     val keys: List<String>,
-    val formatter: @Composable ((values: Map<String, Map<String, Any>>) -> Unit)? = null
+    val formatter: @Composable ((values: Map<String, JSONObject>) -> Unit)? = null
 )
 
 /**
@@ -99,8 +100,8 @@ fun CardListView(
     credentialPack: CredentialPack,
     rendering: CardRenderingListView
 ) {
-    val titleValues = credentialPack.get(rendering.titleKeys)
-    val descriptionValues = credentialPack.get(rendering.descriptionKeys ?: emptyList())
+    val titleValues = credentialPack.findCredentialClaims(rendering.titleKeys)
+    val descriptionValues = credentialPack.findCredentialClaims(rendering.descriptionKeys ?: emptyList())
 
     Row(
         Modifier.height(intrinsicSize = IntrinsicSize.Max)
@@ -108,7 +109,7 @@ fun CardListView(
         // Leading icon
         if(rendering.leadingIconFormatter != null) {
             rendering.leadingIconFormatter.invoke(
-                credentialPack.get(rendering.leadingIconKeys ?: emptyList())
+                credentialPack.findCredentialClaims(rendering.leadingIconKeys ?: emptyList())
             )
         }
 
@@ -118,8 +119,11 @@ fun CardListView(
                 rendering.titleFormatter.invoke(titleValues)
             } else {
                 Text(text = titleValues.values
-                    .fold(emptyList<String>()) { acc, next -> acc + next.values
-                        .joinToString(" ") { value -> value.toString() }
+                    .fold(emptyList<String>()) { acc, next -> acc +
+                        next.keys()
+                            .asSequence()
+                            .map { key -> next.get(key)}
+                            .joinToString(" ") { value -> value.toString() }
                     }.joinToString("").trim())
             }
 
@@ -128,8 +132,11 @@ fun CardListView(
                 rendering.descriptionFormatter.invoke(descriptionValues)
             } else {
                 Text(text = descriptionValues.values
-                    .fold(emptyList<String>()) { acc, next -> acc + next.values
-                        .joinToString(" ") { value -> value.toString() }
+                    .fold(emptyList<String>()) { acc, next -> acc +
+                            next.keys()
+                                .asSequence()
+                                .map { key -> next.get(key)}
+                                .joinToString(" ") { value -> value.toString() }
                     }.joinToString("").trim())
             }
         }
@@ -139,7 +146,7 @@ fun CardListView(
         // Trailing action button
         if(rendering.trailingActionButton != null) {
             rendering.trailingActionButton.invoke(
-                credentialPack.get(rendering.trailingActionKeys ?: emptyList())
+                credentialPack.findCredentialClaims(rendering.trailingActionKeys ?: emptyList())
             )
         }
     }
@@ -157,14 +164,17 @@ fun CardDetailsView(
 ) {
     Column {
         rendering.fields.forEach {
-            val values = credentialPack.get(it.keys)
+            val values = credentialPack.findCredentialClaims(it.keys)
 
             if(it.formatter != null) {
                 it.formatter.invoke(values)
             } else {
                 Text(text = values.values
-                    .fold(emptyList<String>()) { acc, next -> acc + next.values
-                        .joinToString(" ") { value -> value.toString() }
+                    .fold(emptyList<String>()) { acc, next -> acc +
+                            next.keys()
+                                .asSequence()
+                                .map { key -> next.get(key)}
+                                .joinToString(" ") { value -> value.toString() }
                     }.joinToString("").trim())
             }
         }
