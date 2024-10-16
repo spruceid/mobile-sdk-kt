@@ -7,10 +7,9 @@ const val VERIFY_VC_PATH = "verify_vc"
 const val VERIFIER_SETTINGS_HOME_PATH = "verifier_settings_home"
 const val WALLET_SETTINGS_HOME_PATH = "wallet_settings_home"
 const val ADD_TO_WALLET_PATH = "add_to_wallet/{rawCredential}"
-const val OID4VP_PATH = "oid4vp/{params}"
+const val SCAN_QR_PATH = "scan_qr"
 const val OID4VCI_PATH = "oid4vci"
-
-
+const val HANDLE_OID4VP_PATH = "oid4vp/{url}"
 
 sealed class Screen(val route: String) {
     object HomeScreen : Screen(HOME_SCREEN_PATH)
@@ -20,6 +19,7 @@ sealed class Screen(val route: String) {
     object VerifierSettingsHomeScreen : Screen(VERIFIER_SETTINGS_HOME_PATH)
     object WalletSettingsHomeScreen : Screen(WALLET_SETTINGS_HOME_PATH)
     object AddToWalletScreen : Screen(ADD_TO_WALLET_PATH)
-    object ScanQRScreen : Screen(OID4VP_PATH)
+    object ScanQRScreen : Screen(SCAN_QR_PATH)
     object OID4VCIScreen : Screen(OID4VCI_PATH)
+    object HandleOID4VP : Screen(HANDLE_OID4VP_PATH)
 }

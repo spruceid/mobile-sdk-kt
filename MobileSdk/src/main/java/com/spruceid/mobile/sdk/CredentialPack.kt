@@ -4,6 +4,7 @@ import com.spruceid.mobile.sdk.rs.JsonVc
 import com.spruceid.mobile.sdk.rs.JwtVc
 import com.spruceid.mobile.sdk.rs.Mdoc
 import com.spruceid.mobile.sdk.rs.ParsedCredential
+import com.spruceid.mobile.sdk.rs.SdJwt
 import org.json.JSONObject
 
 /**
@@ -45,6 +46,14 @@ class CredentialPack {
     }
 
     /**
+     * Add a SD-JWT to the CredentialPack.
+     */
+    fun addSdJwt(sdJwt: SdJwt): List<ParsedCredential> {
+        credentials.add(ParsedCredential.newSdJwt(sdJwt))
+        return credentials
+    }
+
+    /**
      *  Find claims from all credentials in this CredentialPack.
      */
     fun findCredentialClaims(claimNames: List<String>): Map<String, JSONObject> =
@@ -54,6 +63,7 @@ class CredentialPack {
                 val mdoc = credential.asMsoMdoc()
                 val jwtVc = credential.asJwtVc()
                 val jsonVc = credential.asJsonVc()
+                val sdJwt = credential.asSdJwt()
 
                 if (mdoc != null) {
                     claims = mdoc.jsonEncodedDetailsFiltered(claimNames)
@@ -61,10 +71,12 @@ class CredentialPack {
                     claims = jwtVc.credentialClaimsFiltered(claimNames)
                 } else if (jsonVc != null) {
                     claims = jsonVc.credentialClaimsFiltered(claimNames)
+                } else if (sdJwt != null) {
+                    claims = sdJwt.credentialClaimsFiltered(claimNames)
                 } else {
                     var type: String
                     try {
-                        type = credential.intoGenericForm().type
+                        type = credential.intoGenericForm().type()
                     } catch (e: Error) {
                         type = "unknown"
                     }

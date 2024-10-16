@@ -66,6 +66,7 @@ class AchievementCredentialItem {
 
     constructor(rawCredential: String, onDelete: (() -> Unit)? = null) {
         val decodedSdJwt = decodeRevealSdJwt(rawCredential)
+
         this.credential = JSONObject(decodedSdJwt)
         this.onDelete = onDelete
     }
@@ -244,7 +245,10 @@ class AchievementCredentialItem {
 
     @Composable
     fun detailsComponent() {
+        println("credential: $credential")
+        // NOTE: The credential contains a `vc` property with the verifiable credential payload.
         val awardedDate = keyPathFinder(credential, mutableListOf("awardedDate")).toString()
+        println("awardedDate: $awardedDate")
         val ISO8601DateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss[.SSS]Z")
         val parsedDate = OffsetDateTime.parse(awardedDate, ISO8601DateFormat)
         val dateTimeFormatter = DateTimeFormatter.ofPattern("MMM dd, yyyy 'at' h:mm a")
