@@ -12,8 +12,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavController
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -25,10 +23,12 @@ import com.spruceid.mobile.sdk.rs.HttpResponse
 import com.spruceid.mobile.sdk.rs.Oid4vci
 import com.spruceid.mobile.sdk.rs.generatePopComplete
 import com.spruceid.mobile.sdk.rs.generatePopPrepare
+import com.spruceid.mobilesdkexample.ErrorView
 import com.spruceid.mobilesdkexample.LoadingView
 import com.spruceid.mobilesdkexample.R
 import com.spruceid.mobilesdkexample.ScanningComponent
 import com.spruceid.mobilesdkexample.ScanningType
+import com.spruceid.mobilesdkexample.navigation.Screen
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.request.request
@@ -148,13 +148,15 @@ fun OID4VCIView(
     if (loading) {
         LoadingView(loadingText = "Loading...")
     } else if (err != null) {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(err!!)
-        }
+        ErrorView(
+            errorTitle = "Error Adding Credential",
+            errorDetails = err!!,
+            onClose = {
+                navController.navigate(Screen.HomeScreen.route) {
+                    popUpTo(0)
+                }
+            }
+        )
     } else if (credential == null) {
         ScanningComponent(
             title = "Scan to Add Credential",
