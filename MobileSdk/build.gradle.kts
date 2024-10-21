@@ -116,7 +116,7 @@ android {
 }
 
 dependencies {
-    api("com.spruceid.mobile.sdk.rs:mobilesdkrs:0.0.99c")
+    api("com.spruceid.mobile.sdk.rs:mobilesdkrs:0.0.37-SNAPSHOT")
     //noinspection GradleCompatible
     implementation("com.android.support:appcompat-v7:28.0.0")
     /* Begin UI dependencies */

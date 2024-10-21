@@ -63,7 +63,6 @@ fun HandleOID4VPView(
                     // TODO: Update to use VDC collection in the future
                     // to detect the type of credential.
                     .newSdJwt(SdJwt.newFromCompactSdJwt(rawCredential.rawCredential))
-                    .intoGenericForm()
             }
 
             withContext(Dispatchers.IO) {
