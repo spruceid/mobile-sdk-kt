@@ -22,10 +22,8 @@ fun DispatchQRView(
     val scope = rememberCoroutineScope()
 
     fun onRead(url: String) {
-        println("Reading URL: $url")
-
         scope.launch {
-            if (url.contains(OPEN_ID4VP_SCHEME)) {
+            if (url.startsWith(OPEN_ID4VP_SCHEME)) {
                 val encodedUrl = URLEncoder.encode(url, StandardCharsets.UTF_8.toString())
 
                 navController.navigate("oid4vp/$encodedUrl") {
