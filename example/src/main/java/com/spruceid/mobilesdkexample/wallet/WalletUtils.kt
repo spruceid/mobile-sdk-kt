@@ -65,13 +65,12 @@ fun keyPathFinder(json: Any, path: MutableList<String>): Any {
     }
 }
 
-fun splitCamelCase(s: String): String {
-    return s.replace(
-        String.format(
-            "%s|%s|%s",
-            "(?<=[A-Z])(?=[A-Z][a-z])",
-            "(?<=[^A-Z])(?=[A-Z])",
-            "(?<=[A-Za-z])(?=[^A-Za-z])"
-        ).toRegex(), " "
-    ).replaceFirstChar(Char::titlecase)
-}
+fun String.splitCamelCase() = replace(String.format(
+        "%s|%s|%s",
+        "(?<=[A-Z])(?=[A-Z][a-z])",
+        "(?<=[^A-Z])(?=[A-Z])",
+        "(?<=[A-Za-z])(?=[^A-Za-z])"
+    ).toRegex(), " ")
+    .replaceFirstChar(Char::titlecase)
+
+fun String.removeUnderscores() = replace("_", "")

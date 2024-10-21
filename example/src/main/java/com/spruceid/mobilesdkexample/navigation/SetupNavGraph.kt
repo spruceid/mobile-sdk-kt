@@ -54,7 +54,7 @@ fun SetupNavGraph(
         ) { DispatchQRView(navController) }
         composable(
                 route = Screen.OID4VCIScreen.route,
-        ) { OID4VCIView(navController) }
+        ) { OID4VCIView(navController, rawCredentialsViewModel) }
         composable(
                 route = Screen.HandleOID4VP.route,
                 deepLinks = listOf(navDeepLink { uriPattern = "oid4vp://{url}" })

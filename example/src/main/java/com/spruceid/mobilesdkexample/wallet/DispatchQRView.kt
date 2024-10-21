@@ -1,5 +1,6 @@
 package com.spruceid.mobilesdkexample.wallet
 
+import android.util.Log
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
@@ -22,8 +23,6 @@ fun DispatchQRView(
     val scope = rememberCoroutineScope()
 
     fun onRead(url: String) {
-        println("Reading URL: $url")
-
         scope.launch {
             if (url.contains(OPEN_ID4VP_SCHEME)) {
                 val encodedUrl = URLEncoder.encode(url, StandardCharsets.UTF_8.toString())

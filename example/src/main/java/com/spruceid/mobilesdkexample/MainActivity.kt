@@ -23,7 +23,6 @@ import com.spruceid.mobilesdkexample.viewmodels.IRawCredentialsViewModel
 import com.spruceid.mobilesdkexample.viewmodels.RawCredentialsViewModelFactory
 import kotlinx.coroutines.launch
 import com.spruceid.mobile.sdk.KeyManager
-import com.spruceid.mobilesdkexample.utils.exampleSdJwt
 
 const val DEFAULT_KEY_ID = "key-1"
 

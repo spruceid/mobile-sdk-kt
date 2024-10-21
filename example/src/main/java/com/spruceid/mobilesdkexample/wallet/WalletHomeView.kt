@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.spruceid.mobilesdkexample.R
+import com.spruceid.mobilesdkexample.credentials.GenericCredentialItem
 import com.spruceid.mobilesdkexample.navigation.Screen
 import com.spruceid.mobilesdkexample.ui.theme.CTAButtonBlue
 import com.spruceid.mobilesdkexample.ui.theme.Inter
@@ -117,22 +118,19 @@ fun WalletHomeBody(
         Box(modifier = Modifier.fillMaxSize()) {
             LazyColumn(Modifier.fillMaxWidth().padding(top = 20.dp).padding(bottom = 60.dp)) {
                 items(rawCredentials) { rawCredential ->
-                    AchievementCredentialItem(
-                                    rawCredential.rawCredential,
-                                    onDelete = {
-                                        scope.launch {
-                                            rawCredentialsViewModel.deleteRawCredential(
-                                                    id = rawCredential.id
-                                            )
-                                        }
-                                    }
-                            )
-                            .component()
+                    GenericCredentialItem(
+                        rawCredential = rawCredential.rawCredential,
+                        onDelete = {
+                            scope.launch {
+                                rawCredentialsViewModel.deleteRawCredential(
+                                        id = rawCredential.id
+                                )
+                            }
+                        }
+                    )
+                    .component()
                 }
                 //        item {
-                //            vcs.map { vc ->
-                //                GenericCredentialListItems(vc = vc)
-                //            }
                 //            ShareableCredentialListItems(mdocBase64 = mdocBase64)
                 //        }
             }

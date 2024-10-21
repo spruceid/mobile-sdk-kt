@@ -1,5 +1,6 @@
 package com.spruceid.mobilesdkexample.wallet
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -91,11 +92,15 @@ fun HandleOID4VPView(
     LaunchedEffect(Unit) {
         try {
             val credentials = rawCredentials.map { rawCredential ->
-                ParsedCredential
-                    // TODO: Update to use VDC collection in the future
-                    // to detect the type of credential.
-                    .newSdJwt(SdJwt.newFromCompactSdJwt(rawCredential.rawCredential))
-            }
+                try {
+                    ParsedCredential
+                        // TODO: Update to use VDC collection in the future
+                        // to detect the type of credential.
+                        .newSdJwt(SdJwt.newFromCompactSdJwt(rawCredential.rawCredential))
+                } catch(_: Exception)  {
+                    null
+                }
+            }.filterNotNull()
 
             val credentialPack = CredentialPack()
 
@@ -122,7 +127,7 @@ fun HandleOID4VPView(
 
     if(err != null) {
         ErrorView(
-            errorTitle = "Error Adding Credential",
+            errorTitle = "Error Presenting Credential",
             errorDetails = err!!,
             onClose = {
                 navController.navigate(Screen.HomeScreen.route) {

@@ -267,7 +267,7 @@ class AchievementCredentialItem {
             Column {
                 details.map { detail ->
                     Text(
-                        text = splitCamelCase(detail.first),
+                        text = detail.first.splitCamelCase(),
                         fontFamily = Inter,
                         fontWeight = FontWeight.Normal,
                         fontSize = 14.sp,
