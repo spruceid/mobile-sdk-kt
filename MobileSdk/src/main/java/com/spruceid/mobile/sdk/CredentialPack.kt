@@ -66,13 +66,29 @@ class CredentialPack {
                 val sdJwt = credential.asSdJwt()
 
                 if (mdoc != null) {
-                    claims = mdoc.jsonEncodedDetailsFiltered(claimNames)
+                    claims = if (claimNames.isNotEmpty()) {
+                        mdoc.jsonEncodedDetailsFiltered(claimNames)
+                    } else {
+                        mdoc.jsonEncodedDetailsAll()
+                    }
                 } else if (jwtVc != null) {
-                    claims = jwtVc.credentialClaimsFiltered(claimNames)
+                    claims = if (claimNames.isNotEmpty()) {
+                        jwtVc.credentialClaimsFiltered(claimNames)
+                    } else {
+                        jwtVc.credentialClaims()
+                    }
                 } else if (jsonVc != null) {
-                    claims = jsonVc.credentialClaimsFiltered(claimNames)
+                    claims = if (claimNames.isNotEmpty()) {
+                        jsonVc.credentialClaimsFiltered(claimNames)
+                    } else {
+                        jsonVc.credentialClaims()
+                    }
                 } else if (sdJwt != null) {
-                    claims = sdJwt.credentialClaimsFiltered(claimNames)
+                    claims = if (claimNames.isNotEmpty()) {
+                        sdJwt.credentialClaimsFiltered(claimNames)
+                    } else {
+                        sdJwt.credentialClaims()
+                    }
                 } else {
                     var type: String
                     try {

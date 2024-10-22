@@ -43,8 +43,8 @@ import com.spruceid.mobilesdkexample.ui.theme.ColorRose600
 import com.spruceid.mobilesdkexample.ui.theme.ColorStone300
 import com.spruceid.mobilesdkexample.ui.theme.ColorStone50
 import com.spruceid.mobilesdkexample.ui.theme.ColorStone600
+import com.spruceid.mobilesdkexample.ui.theme.ColorStone950
 import com.spruceid.mobilesdkexample.ui.theme.Inter
-import com.spruceid.mobilesdkexample.ui.theme.TextPrimary
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -102,7 +102,7 @@ fun ErrorView(
                 shape = RoundedCornerShape(6.dp),
                 colors =  ButtonDefaults.buttonColors(
                     containerColor = Color.Transparent,
-                    contentColor = TextPrimary,
+                    contentColor = ColorStone950,
                 ),
                 modifier = Modifier
                     .fillMaxWidth()
@@ -117,7 +117,7 @@ fun ErrorView(
                     text = closeButtonLabel,
                     fontFamily = Inter,
                     fontWeight = FontWeight.SemiBold,
-                    color = TextPrimary,
+                    color = ColorStone950,
                 )
             }
         }
@@ -175,7 +175,7 @@ fun ErrorView(
                                 shape = RoundedCornerShape(6.dp),
                                 colors =  ButtonDefaults.buttonColors(
                                     containerColor = Color.Transparent,
-                                    contentColor = TextPrimary,
+                                    contentColor = ColorStone950,
                                 ),
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -190,7 +190,7 @@ fun ErrorView(
                                     text = "Close",
                                     fontFamily = Inter,
                                     fontWeight = FontWeight.SemiBold,
-                                    color = TextPrimary,
+                                    color = ColorStone950,
                                 )
                             }
                         }

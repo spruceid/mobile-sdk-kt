@@ -7,10 +7,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.navigation.NavController
-import com.spruceid.mobilesdkexample.ScanningComponent
-import com.spruceid.mobilesdkexample.ScanningType
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.spruceid.mobile.sdk.rs.verifyJwtVp
+import com.spruceid.mobilesdkexample.ScanningComponent
+import com.spruceid.mobilesdkexample.ScanningType
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 

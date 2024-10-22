@@ -3,6 +3,7 @@ package com.spruceid.mobilesdkexample.wallet
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -39,6 +40,7 @@ import com.spruceid.mobilesdkexample.ui.theme.CTAButtonBlue
 import com.spruceid.mobilesdkexample.ui.theme.Inter
 import com.spruceid.mobilesdkexample.ui.theme.Primary
 import com.spruceid.mobilesdkexample.ui.theme.TextHeader
+import com.spruceid.mobilesdkexample.utils.credentialDisplaySelector
 import com.spruceid.mobilesdkexample.viewmodels.IRawCredentialsViewModel
 import kotlinx.coroutines.launch
 
@@ -117,22 +119,19 @@ fun WalletHomeBody(
         Box(modifier = Modifier.fillMaxSize()) {
             LazyColumn(Modifier.fillMaxWidth().padding(top = 20.dp).padding(bottom = 60.dp)) {
                 items(rawCredentials) { rawCredential ->
-                    AchievementCredentialItem(
-                                    rawCredential.rawCredential,
-                                    onDelete = {
-                                        scope.launch {
-                                            rawCredentialsViewModel.deleteRawCredential(
-                                                    id = rawCredential.id
-                                            )
-                                        }
-                                    }
-                            )
-                            .component()
+                    credentialDisplaySelector(
+                        rawCredential = rawCredential.rawCredential,
+                        onDelete = {
+                            scope.launch {
+                                rawCredentialsViewModel.deleteRawCredential(
+                                        id = rawCredential.id
+                                )
+                            }
+                        }
+                    )
+                    .credentialPreviewAndDetails()
                 }
                 //        item {
-                //            vcs.map { vc ->
-                //                GenericCredentialListItems(vc = vc)
-                //            }
                 //            ShareableCredentialListItems(mdocBase64 = mdocBase64)
                 //        }
             }
@@ -168,14 +167,23 @@ fun WalletHomeBody(
             }
         }
     } else {
-        Column {
-            Spacer(modifier = Modifier.weight(1f))
-            Image(
+        Box(Modifier.fillMaxSize()) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Image(
+                    painter = painterResource(id = R.drawable.add_first_credential),
+                    contentDescription = stringResource(id = R.string.add_first_credential),
+                )
+            }
+            Column(
+                Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Image(
                     painter = painterResource(id = R.drawable.empty_wallet),
-                    contentDescription = stringResource(id = R.string.user),
-                    modifier = Modifier.weight(1f)
-            )
-            Spacer(modifier = Modifier.weight(1f))
+                    contentDescription = stringResource(id = R.string.empty_wallet),
+                )
+            }
         }
     }
 }

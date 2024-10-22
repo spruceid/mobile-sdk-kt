@@ -3,6 +3,7 @@ package com.spruceid.mobilesdkexample
 import android.app.Application
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -14,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.coroutineScope
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.spruceid.mobile.sdk.KeyManager
 import com.spruceid.mobilesdkexample.db.AppDatabase
 import com.spruceid.mobilesdkexample.db.RawCredentialsRepository
 import com.spruceid.mobilesdkexample.navigation.SetupNavGraph
@@ -22,8 +24,8 @@ import com.spruceid.mobilesdkexample.ui.theme.MobileSdkTheme
 import com.spruceid.mobilesdkexample.viewmodels.IRawCredentialsViewModel
 import com.spruceid.mobilesdkexample.viewmodels.RawCredentialsViewModelFactory
 import kotlinx.coroutines.launch
-import com.spruceid.mobile.sdk.KeyManager
-import com.spruceid.mobilesdkexample.utils.exampleSdJwt
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 
 const val DEFAULT_KEY_ID = "key-1"
 
@@ -32,15 +34,6 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        val deepLinkUri: Uri? = intent.data
-        if (deepLinkUri != null) {
-            // Remove? TBD
-            if (deepLinkUri.scheme == "oid4vp://") {
-                // NOTE: See DispatchQRView.kt for handling OID4VP QR code scanning,
-                // and credential selection.
-            }
-        }
 
         enableEdgeToEdge()
         setContent {

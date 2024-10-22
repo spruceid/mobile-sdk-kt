@@ -6,12 +6,12 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navDeepLink
 import com.spruceid.mobilesdkexample.HomeView
+import com.spruceid.mobilesdkexample.credentials.AddToWalletView
 import com.spruceid.mobilesdkexample.verifier.VerifyDLView
 import com.spruceid.mobilesdkexample.verifier.VerifyEAView
 import com.spruceid.mobilesdkexample.verifier.VerifyVCView
 import com.spruceid.mobilesdkexample.verifiersettings.VerifierSettingsHomeView
 import com.spruceid.mobilesdkexample.viewmodels.IRawCredentialsViewModel
-import com.spruceid.mobilesdkexample.wallet.AddToWalletView
 import com.spruceid.mobilesdkexample.wallet.DispatchQRView
 import com.spruceid.mobilesdkexample.wallet.HandleOID4VPView
 import com.spruceid.mobilesdkexample.wallet.OID4VCIView
@@ -54,12 +54,15 @@ fun SetupNavGraph(
         ) { DispatchQRView(navController) }
         composable(
                 route = Screen.OID4VCIScreen.route,
-        ) { OID4VCIView(navController) }
+        ) { OID4VCIView(navController, rawCredentialsViewModel) }
         composable(
                 route = Screen.HandleOID4VP.route,
-                deepLinks = listOf(navDeepLink { uriPattern = "oid4vp://{url}" })
+                deepLinks = listOf(navDeepLink { uriPattern = "openid4vp://{url}" })
         ) { backStackEntry ->
-            val url = backStackEntry.arguments?.getString("url")!!
+            var url = backStackEntry.arguments?.getString("url")!!
+            if (!url.startsWith("openid4vp")) {
+                url = "openid4vp://$url"
+            }
             HandleOID4VPView(navController, rawCredentialsViewModel, url)
         }
     }

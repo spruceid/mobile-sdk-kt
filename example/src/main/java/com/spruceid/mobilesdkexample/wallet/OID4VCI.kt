@@ -2,18 +2,14 @@ package com.spruceid.mobilesdkexample.wallet
 
 import android.content.Context
 import android.util.Base64
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
-import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.spruceid.mobile.sdk.KeyManager
 import com.spruceid.mobile.sdk.rs.AsyncHttpClient
@@ -28,7 +24,9 @@ import com.spruceid.mobilesdkexample.LoadingView
 import com.spruceid.mobilesdkexample.R
 import com.spruceid.mobilesdkexample.ScanningComponent
 import com.spruceid.mobilesdkexample.ScanningType
+import com.spruceid.mobilesdkexample.credentials.AddToWalletView
 import com.spruceid.mobilesdkexample.navigation.Screen
+import com.spruceid.mobilesdkexample.viewmodels.IRawCredentialsViewModel
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.request.request
@@ -36,13 +34,15 @@ import io.ktor.client.request.setBody
 import io.ktor.client.statement.readBytes
 import io.ktor.http.HttpMethod
 import io.ktor.util.toMap
-import kotlinx.coroutines.*
-import kotlin.math.min
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
+import org.json.JSONObject
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
 fun OID4VCIView(
-    navController: NavController
+    navController: NavHostController,
+    rawCredentialsViewModel: IRawCredentialsViewModel
 ) {
     var loading by remember {
         mutableStateOf(false)
@@ -132,10 +132,12 @@ fun OID4VCIView(
 
                 credentials?.forEach { cred ->
                     cred.payload.toString(Charsets.UTF_8).let {
-                        credential = it.substring(0, min(1500, it.length))
-                        // TODO: add to credentialPack
+                        // Removes the renderMethod to avoid storage issues
+                        // TODO: Remove this when replace the storage component
+                        val json = JSONObject(it)
+                        json.remove("renderMethod")
+                        credential = json.toString()
                     }
-
                 }
             } catch (e: Exception) {
                 err = e.localizedMessage
@@ -165,7 +167,11 @@ fun OID4VCIView(
             onRead = ::getCredential
         )
     } else {
-        Text(credential!!)
+        AddToWalletView(
+            navController = navController,
+            rawCredential = credential!!,
+            rawCredentialsViewModel = rawCredentialsViewModel,
+        )
     }
 }
 
