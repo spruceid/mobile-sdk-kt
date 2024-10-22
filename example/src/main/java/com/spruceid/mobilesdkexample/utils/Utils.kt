@@ -27,7 +27,7 @@ const val keyPEM =
 const val keyBase64 =
         "MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgEAqKZdZQgPVtjlEBfz2ItHG8oXIONenOxRePtqOQ42yhRANCAATA43gI2Ib8+qKK4YEOfNCRiNOhyHaCLgAvKdhHS+y6wpG3oJ2xudXagzKKbcfvUda4x0j8zR1/oD56mpm85GbO"
 
-val trustedDids = MutableList(1) { "did:web:97ae-99-209-178-38.ngrok-free.app:oid4vp:client" }
+val trustedDids = MutableList(1) { "did:web:0808-2001-1284-f50e-da31-25fe-76c-81c7-63ef.ngrok-free.app:oid4vp:client" }
 
 fun String.splitCamelCase() = replace(String.format(
         "%s|%s|%s",

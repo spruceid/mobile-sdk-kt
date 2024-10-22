@@ -27,7 +27,7 @@ class IsoMdlPresentation(
     var itemsRequests: List<ItemsRequest> = listOf()
     var bleManager: Transport? = null
 
-    suspend fun initialize() {
+    fun initialize() {
         try {
             session = initializeMdlPresentationFromBytes(this.mdoc, uuid.toString())
             this.bleManager = Transport(this.bluetoothManager)
