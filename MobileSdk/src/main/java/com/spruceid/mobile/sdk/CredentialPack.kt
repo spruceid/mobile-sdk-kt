@@ -92,7 +92,7 @@ class CredentialPack {
                 } else {
                     var type: String
                     try {
-                        type = credential.intoGenericForm().type()
+                        type = credential.intoGenericForm().type
                     } catch (e: Error) {
                         type = "unknown"
                     }
