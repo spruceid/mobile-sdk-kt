@@ -59,8 +59,11 @@ fun SetupNavGraph(
                 route = Screen.HandleOID4VP.route,
                 deepLinks = listOf(navDeepLink { uriPattern = "openid4vp://{url}" })
         ) { backStackEntry ->
-            val url = backStackEntry.arguments?.getString("url")!!
-            HandleOID4VPView(navController, rawCredentialsViewModel, "openid4vp://$url")
+            var url = backStackEntry.arguments?.getString("url")!!
+            if (!url.startsWith("openid4vp")) {
+                url = "openid4vp://$url"
+            }
+            HandleOID4VPView(navController, rawCredentialsViewModel, url)
         }
     }
 }
