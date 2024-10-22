@@ -7,6 +7,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
+import com.spruceid.mobilesdkexample.ui.theme.ColorStone500
+import com.spruceid.mobilesdkexample.ui.theme.ColorStone950
+import com.spruceid.mobilesdkexample.ui.theme.Inter
 import java.time.OffsetDateTime
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
@@ -36,5 +41,11 @@ fun CredentialDate(dateString: String) {
         date = dateString
     }
 
-    date?.let { Text(it) }
+    date?.let { Text(
+        it,
+        fontFamily = Inter,
+        fontWeight = FontWeight.Normal,
+        fontSize = 17.sp,
+        color = ColorStone950,
+    ) }
 }

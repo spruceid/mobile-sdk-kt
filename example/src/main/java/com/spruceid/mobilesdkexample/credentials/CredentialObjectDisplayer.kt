@@ -1,23 +1,23 @@
 package com.spruceid.mobilesdkexample.credentials
 
-import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import org.json.JSONArray
-import org.json.JSONObject
 import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.spruceid.mobilesdkexample.ui.theme.ColorStone500
+import com.spruceid.mobilesdkexample.ui.theme.ColorStone950
 import com.spruceid.mobilesdkexample.ui.theme.Inter
-import com.spruceid.mobilesdkexample.ui.theme.TextPrimary
-import com.spruceid.mobilesdkexample.wallet.removeUnderscores
-import com.spruceid.mobilesdkexample.wallet.splitCamelCase
+import com.spruceid.mobilesdkexample.utils.removeUnderscores
+import com.spruceid.mobilesdkexample.utils.splitCamelCase
+import org.json.JSONArray
+import org.json.JSONObject
 
 
 @Composable
@@ -70,7 +70,7 @@ fun genericObjectDisplayer(obj: JSONObject, filter: List<String>, level: Int = 1
                             fontFamily = Inter,
                             fontWeight = FontWeight.Bold,
                             fontSize = 16.sp,
-                            color = TextPrimary,
+                            color = ColorStone500,
                         )
                         Column(
                             Modifier
@@ -82,7 +82,7 @@ fun genericObjectDisplayer(obj: JSONObject, filter: List<String>, level: Int = 1
                                             color = Color.Black,
                                             start = Offset.Zero,
                                             end = Offset(0f, this.size.height),
-                                            strokeWidth= 1f
+                                            strokeWidth = 1f
                                         )
 
                                         // draw the content
@@ -104,11 +104,11 @@ fun genericObjectDisplayer(obj: JSONObject, filter: List<String>, level: Int = 1
                             res.add(
                                 Column {
                                     Text(
-                                        i.toString(),
+                                        "${key.splitCamelCase().removeUnderscores()}.$i",
                                         fontFamily = Inter,
                                         fontWeight = FontWeight.Bold,
                                         fontSize = 16.sp,
-                                        color = TextPrimary,
+                                        color = ColorStone500,
                                     )
                                     Column(
                                         Modifier
@@ -120,7 +120,7 @@ fun genericObjectDisplayer(obj: JSONObject, filter: List<String>, level: Int = 1
                                                         color = Color.Black,
                                                         start = Offset.Zero,
                                                         end = Offset(0f, this.size.height),
-                                                        strokeWidth= 1f
+                                                        strokeWidth = 1f
                                                     )
 
                                                     // draw the content
@@ -133,8 +133,6 @@ fun genericObjectDisplayer(obj: JSONObject, filter: List<String>, level: Int = 1
                                     }
                                 }
                             )
-                        } else {
-
                         }
                     }
                 } else {
@@ -144,7 +142,13 @@ fun genericObjectDisplayer(obj: JSONObject, filter: List<String>, level: Int = 1
                         value.contains("data:image")) {
                         res.add(
                             Column(Modifier.padding(vertical = 10.dp)) {
-                                Text(key.splitCamelCase().removeUnderscores())
+                                Text(
+                                    key.splitCamelCase().removeUnderscores(),
+                                    fontFamily = Inter,
+                                    fontWeight = FontWeight.Normal,
+                                    fontSize = 16.sp,
+                                    color = ColorStone500,
+                                )
                                 CredentialImage(value, key)
                             }
                         )
@@ -154,15 +158,33 @@ fun genericObjectDisplayer(obj: JSONObject, filter: List<String>, level: Int = 1
 
                         res.add(
                             Column(Modifier.padding(vertical = 10.dp)) {
-                                Text(key.splitCamelCase().removeUnderscores())
+                                Text(
+                                    key.splitCamelCase().removeUnderscores(),
+                                    fontFamily = Inter,
+                                    fontWeight = FontWeight.Normal,
+                                    fontSize = 16.sp,
+                                    color = ColorStone500,
+                                )
                                 CredentialDate(value)
                             }
                         )
                     } else {
                         res.add(
                             Column(Modifier.padding(vertical = 10.dp)) {
-                                Text(key.splitCamelCase().removeUnderscores())
-                                Text(value)
+                                Text(
+                                    key.splitCamelCase().removeUnderscores(),
+                                    fontFamily = Inter,
+                                    fontWeight = FontWeight.Normal,
+                                    fontSize = 16.sp,
+                                    color = ColorStone500
+                                )
+                                Text(
+                                    value,
+                                    fontFamily = Inter,
+                                    fontWeight = FontWeight.Normal,
+                                    fontSize = 17.sp,
+                                    color = ColorStone950,
+                                )
                             }
                         )
                     }

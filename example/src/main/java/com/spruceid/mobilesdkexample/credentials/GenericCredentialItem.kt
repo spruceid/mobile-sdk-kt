@@ -1,6 +1,5 @@
 package com.spruceid.mobilesdkexample.credentials
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -15,15 +14,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.ModalBottomSheetProperties
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -44,11 +40,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.spruceid.mobile.sdk.CredentialPack
-import com.spruceid.mobile.sdk.rs.JsonVc
-import com.spruceid.mobile.sdk.rs.JwtVc
-import com.spruceid.mobile.sdk.rs.Mdoc
-import com.spruceid.mobile.sdk.rs.SdJwt
-import com.spruceid.mobile.sdk.rs.Uuid
 import com.spruceid.mobile.sdk.ui.BaseCard
 import com.spruceid.mobile.sdk.ui.CardRenderingDetailsField
 import com.spruceid.mobile.sdk.ui.CardRenderingDetailsView
@@ -62,39 +53,12 @@ import com.spruceid.mobilesdkexample.ui.theme.SecondaryButtonRed
 import com.spruceid.mobilesdkexample.ui.theme.SpruceBlue
 import com.spruceid.mobilesdkexample.ui.theme.TextBody
 import com.spruceid.mobilesdkexample.ui.theme.TextHeader
-import com.spruceid.mobilesdkexample.wallet.removeUnderscores
-import com.spruceid.mobilesdkexample.wallet.splitCamelCase
+import com.spruceid.mobilesdkexample.utils.addCredential
+import com.spruceid.mobilesdkexample.utils.splitCamelCase
 import kotlinx.coroutines.launch
-import org.json.JSONArray
 import org.json.JSONObject
 
-fun addCredential(credentialPack: CredentialPack, rawCredential: String): CredentialPack {
-    try {
-        credentialPack.addJsonVc(JsonVc.newFromJson(rawCredential))
-        return credentialPack
-    } catch (_: Exception) {}
-
-    try {
-        credentialPack.addSdJwt(SdJwt.newFromCompactSdJwt(rawCredential))
-        return credentialPack
-    } catch (_: Exception) {}
-
-    try {
-        credentialPack.addJwtVc(JwtVc.newFromCompactJws(rawCredential))
-        return credentialPack
-    } catch (_: Exception) {}
-
-    try {
-        credentialPack.addMdoc(Mdoc.fromStringifiedDocument(rawCredential, keyAlias = Uuid()))
-        return credentialPack
-    } catch (_: Exception) {}
-
-    println("Couldn't parse credential $rawCredential")
-
-    return credentialPack
-}
-
-class GenericCredentialItem {
+class GenericCredentialItem: ICredentialView {
     private var credentialPack: CredentialPack
     private val onDelete: (() -> Unit)?
 
@@ -113,7 +77,11 @@ class GenericCredentialItem {
         val credential = values.toList().firstNotNullOfOrNull {
             val cred = credentialPack.getCredentialById(it.first)
             try {
-                if (cred?.asJwtVc() != null || cred?.asJsonVc() != null) {
+                if (
+                    cred?.asJwtVc() != null ||
+                    cred?.asJsonVc() != null||
+                    cred?.asSdJwt() != null
+                ) {
                     it.second
                 } else {
                     null
@@ -151,7 +119,11 @@ class GenericCredentialItem {
         val credential = values.toList().firstNotNullOfOrNull {
             val cred = credentialPack.getCredentialById(it.first)
             try {
-                if (cred?.asJwtVc() != null || cred?.asJsonVc() != null) {
+                if (
+                    cred?.asJwtVc() != null ||
+                    cred?.asJsonVc() != null||
+                    cred?.asSdJwt() != null
+                ) {
                     it.second
                 } else {
                     null
@@ -199,14 +171,18 @@ class GenericCredentialItem {
     }
 
     @Composable
-    fun cardList() {
+    fun listItem() {
         val listRendering = CardRenderingListView(
             titleKeys = listOf("name", "type"),
             titleFormatter = { values ->
                 val credential = values.toList().firstNotNullOfOrNull {
                     val cred = credentialPack.getCredentialById(it.first)
                     try {
-                        if (cred?.asJwtVc() != null || cred?.asJsonVc() != null) {
+                        if (
+                            cred?.asJwtVc() != null ||
+                            cred?.asJsonVc() != null||
+                            cred?.asSdJwt() != null
+                        ) {
                             it.second
                         } else {
                             null
@@ -257,7 +233,7 @@ class GenericCredentialItem {
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    fun cardListWithOptions() {
+    fun listItemWithOptions() {
         val sheetState = rememberModalBottomSheetState()
         val scope = rememberCoroutineScope()
         var showBottomSheet by remember { mutableStateOf(false) }
@@ -268,7 +244,11 @@ class GenericCredentialItem {
                 val credential = values.toList().firstNotNullOfOrNull {
                     val cred = credentialPack.getCredentialById(it.first)
                     try {
-                        if (cred?.asJwtVc() != null || cred?.asJsonVc() != null) {
+                        if (
+                            cred?.asJwtVc() != null ||
+                            cred?.asJsonVc() != null||
+                            cred?.asSdJwt() != null
+                        ) {
                             it.second
                         } else {
                             null
@@ -400,7 +380,7 @@ class GenericCredentialItem {
     }
 
     @Composable
-    fun listComponent(withOptions: Boolean = false) {
+    override fun credentialListItem(withOptions: Boolean) {
         Column(
             Modifier
                 .padding(vertical = 10.dp)
@@ -412,15 +392,31 @@ class GenericCredentialItem {
                 .padding(12.dp)
         ) {
             if (withOptions) {
-                cardListWithOptions()
+                listItemWithOptions()
             } else {
-                cardList()
+                listItem()
             }
         }
     }
 
     @Composable
-    fun cardDetails() {
+    override fun credentialListItem() {
+        Column(
+            Modifier
+                .padding(vertical = 10.dp)
+                .border(
+                    width = 1.dp,
+                    color = CredentialBorder,
+                    shape = RoundedCornerShape(8.dp)
+                )
+                .padding(12.dp)
+        ) {
+            listItem()
+        }
+    }
+
+    @Composable
+    override fun credentialDetails() {
         val detailsRendering = CardRenderingDetailsView(
             fields = listOf(
                 CardRenderingDetailsField(
@@ -430,7 +426,11 @@ class GenericCredentialItem {
                         val credential = values.toList().firstNotNullOfOrNull {
                             val cred = credentialPack.getCredentialById(it.first)
                             try {
-                                if (cred?.asJwtVc() != null || cred?.asJsonVc() != null) {
+                                if (
+                                    cred?.asJwtVc() != null ||
+                                    cred?.asJsonVc() != null ||
+                                    cred?.asSdJwt() != null
+                                ) {
                                     it.second
                                 } else {
                                     null
@@ -439,18 +439,13 @@ class GenericCredentialItem {
                                 null
                             }
                         }
-
                         genericObjectDisplayer(credential!!, listOf("id", "identifier", "type", "proof", "renderMethod", "@context"))
                     }
                 )
             )
         )
 
-        Box(
-            Modifier
-                .fillMaxWidth()
-                .padding(24.dp)
-        ) {
+        Box(Modifier.fillMaxWidth()) {
             BaseCard(
                 credentialPack = credentialPack,
                 rendering = detailsRendering.toCardRendering()
@@ -460,7 +455,7 @@ class GenericCredentialItem {
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    fun component() {
+    override fun credentialPreviewAndDetails() {
         var sheetOpen by remember {
             mutableStateOf(false)
         }
@@ -471,7 +466,7 @@ class GenericCredentialItem {
                     sheetOpen = true
                 }
         ) {
-            listComponent(withOptions = true)
+            credentialListItem(withOptions = true)
         }
 
         if (sheetOpen) {
@@ -502,9 +497,9 @@ class GenericCredentialItem {
                         modifier = Modifier
                             .fillMaxWidth()
                     )
-                    listComponent()
+                    credentialListItem()
 
-                    cardDetails()
+                    credentialDetails()
                 }
             }
         }

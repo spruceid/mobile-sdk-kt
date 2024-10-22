@@ -1,6 +1,5 @@
 package com.spruceid.mobilesdkexample.wallet
 
-import android.util.Log
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
@@ -8,9 +7,9 @@ import androidx.navigation.NavController
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.spruceid.mobilesdkexample.ScanningComponent
 import com.spruceid.mobilesdkexample.ScanningType
+import kotlinx.coroutines.launch
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
-import kotlinx.coroutines.launch
 
 // The scheme for the OID4VP QR code.
 const val OPEN_ID4VP_SCHEME = "openid4vp://"

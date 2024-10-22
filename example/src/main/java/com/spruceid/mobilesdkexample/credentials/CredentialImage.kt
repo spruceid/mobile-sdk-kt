@@ -9,7 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
-import com.spruceid.mobilesdkexample.wallet.BitmapImage
+import com.spruceid.mobilesdkexample.utils.BitmapImage
 
 @Composable
 fun CredentialImage(image: String, alt: String) {

@@ -26,9 +26,9 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.spruceid.mobilesdkexample.ui.theme.MobileSdkTheme
 import com.spruceid.mobilesdkexample.ui.theme.Primary
 import com.spruceid.mobilesdkexample.ui.theme.SpruceBlue
-import com.spruceid.mobilesdkexample.ui.theme.MobileSdkTheme
 
 @Composable
 fun Loader() {

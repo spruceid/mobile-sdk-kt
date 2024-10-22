@@ -1,57 +1,55 @@
 package com.spruceid.mobilesdkexample.wallet
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.runtime.*
-import androidx.compose.material3.*
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
-import com.spruceid.mobile.sdk.rs.Holder
-import com.spruceid.mobile.sdk.rs.ParsedCredential
-import com.spruceid.mobile.sdk.rs.PermissionRequest
-import com.spruceid.mobile.sdk.rs.SdJwt
-import com.spruceid.mobilesdkexample.ui.theme.Inter
-import com.spruceid.mobilesdkexample.viewmodels.IRawCredentialsViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.ParagraphStyle
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextIndent
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.spruceid.mobile.sdk.CredentialPack
+import com.spruceid.mobile.sdk.rs.Holder
+import com.spruceid.mobile.sdk.rs.ParsedCredential
+import com.spruceid.mobile.sdk.rs.PermissionRequest
 import com.spruceid.mobile.sdk.rs.PermissionResponse
 import com.spruceid.mobile.sdk.rs.RequestedField
+import com.spruceid.mobile.sdk.rs.SdJwt
 import com.spruceid.mobilesdkexample.ErrorView
 import com.spruceid.mobilesdkexample.LoadingView
 import com.spruceid.mobilesdkexample.R
@@ -63,10 +61,14 @@ import com.spruceid.mobilesdkexample.ui.theme.ColorBlue600
 import com.spruceid.mobilesdkexample.ui.theme.ColorEmerald900
 import com.spruceid.mobilesdkexample.ui.theme.ColorStone600
 import com.spruceid.mobilesdkexample.ui.theme.ColorStone950
+import com.spruceid.mobilesdkexample.ui.theme.Inter
 import com.spruceid.mobilesdkexample.ui.theme.TextBase
 import com.spruceid.mobilesdkexample.ui.theme.TextHeader
-import com.spruceid.mobilesdkexample.ui.theme.TextPrimary
 import com.spruceid.mobilesdkexample.utils.trustedDids
+import com.spruceid.mobilesdkexample.viewmodels.IRawCredentialsViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.json.JSONObject
 
 @Composable
@@ -249,7 +251,7 @@ fun DataFieldSelector(
                 shape = RoundedCornerShape(6.dp),
                 colors =  ButtonDefaults.buttonColors(
                     containerColor = Color.Transparent,
-                    contentColor = TextPrimary,
+                    contentColor = ColorStone950,
                 ),
                 modifier = Modifier
                     .fillMaxWidth()
@@ -264,7 +266,7 @@ fun DataFieldSelector(
                     text = "Cancel",
                     fontFamily = Inter,
                     fontWeight = FontWeight.SemiBold,
-                    color = TextPrimary,
+                    color = ColorStone950,
                 )
             }
 
@@ -401,7 +403,7 @@ fun CredentialSelector(
                 shape = RoundedCornerShape(6.dp),
                 colors =  ButtonDefaults.buttonColors(
                     containerColor = Color.Transparent,
-                    contentColor = TextPrimary,
+                    contentColor = ColorStone950,
                 ),
                 modifier = Modifier
                     .fillMaxWidth()
@@ -416,7 +418,7 @@ fun CredentialSelector(
                     text = "Cancel",
                     fontFamily = Inter,
                     fontWeight = FontWeight.SemiBold,
-                    color = TextPrimary,
+                    color = ColorStone950,
                 )
             }
 

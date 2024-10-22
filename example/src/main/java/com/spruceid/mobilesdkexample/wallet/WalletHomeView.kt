@@ -34,12 +34,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.spruceid.mobilesdkexample.R
-import com.spruceid.mobilesdkexample.credentials.GenericCredentialItem
 import com.spruceid.mobilesdkexample.navigation.Screen
 import com.spruceid.mobilesdkexample.ui.theme.CTAButtonBlue
 import com.spruceid.mobilesdkexample.ui.theme.Inter
 import com.spruceid.mobilesdkexample.ui.theme.Primary
 import com.spruceid.mobilesdkexample.ui.theme.TextHeader
+import com.spruceid.mobilesdkexample.utils.credentialDisplaySelector
 import com.spruceid.mobilesdkexample.viewmodels.IRawCredentialsViewModel
 import kotlinx.coroutines.launch
 
@@ -118,7 +118,7 @@ fun WalletHomeBody(
         Box(modifier = Modifier.fillMaxSize()) {
             LazyColumn(Modifier.fillMaxWidth().padding(top = 20.dp).padding(bottom = 60.dp)) {
                 items(rawCredentials) { rawCredential ->
-                    GenericCredentialItem(
+                    credentialDisplaySelector(
                         rawCredential = rawCredential.rawCredential,
                         onDelete = {
                             scope.launch {
@@ -128,7 +128,7 @@ fun WalletHomeBody(
                             }
                         }
                     )
-                    .component()
+                    .credentialPreviewAndDetails()
                 }
                 //        item {
                 //            ShareableCredentialListItems(mdocBase64 = mdocBase64)
