@@ -30,6 +30,7 @@ import com.spruceid.mobile.sdk.getBluetoothManager
 import com.spruceid.mobile.sdk.getPermissions
 import com.spruceid.mobilesdkexample.rememberQrBitmapPainter
 import com.spruceid.mobilesdkexample.ui.theme.Inter
+import com.spruceid.mobilesdkexample.utils.checkAndRequestBluetoothPermissions
 
 @Composable
 fun ShareView(

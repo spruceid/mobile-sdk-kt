@@ -14,4 +14,8 @@
     <string name="chevron">Start action</string>
     <string name="empty_wallet">No credentials added yet</string>
     <string name="three_dots">More options</string>
+    <string name="expand">Click to expand</string>
+    <string name="collapse">Click to collapse</string>
+    <string name="error">Error</string>
+    <string name="add_first_credential">Click on the button to add your first credential</string>
 </resources>

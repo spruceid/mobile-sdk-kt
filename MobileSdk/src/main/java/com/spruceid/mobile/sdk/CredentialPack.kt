@@ -4,6 +4,7 @@ import com.spruceid.mobile.sdk.rs.JsonVc
 import com.spruceid.mobile.sdk.rs.JwtVc
 import com.spruceid.mobile.sdk.rs.Mdoc
 import com.spruceid.mobile.sdk.rs.ParsedCredential
+import com.spruceid.mobile.sdk.rs.Vcdm2SdJwt
 import org.json.JSONObject
 
 /**
@@ -45,6 +46,14 @@ class CredentialPack {
     }
 
     /**
+     * Add a SD-JWT to the CredentialPack.
+     */
+    fun addSdJwt(sdJwt: Vcdm2SdJwt): List<ParsedCredential> {
+        credentials.add(ParsedCredential.newSdJwt(sdJwt))
+        return credentials
+    }
+
+    /**
      *  Find claims from all credentials in this CredentialPack.
      */
     fun findCredentialClaims(claimNames: List<String>): Map<String, JSONObject> =
@@ -54,13 +63,32 @@ class CredentialPack {
                 val mdoc = credential.asMsoMdoc()
                 val jwtVc = credential.asJwtVc()
                 val jsonVc = credential.asJsonVc()
+                val sdJwt = credential.asSdJwt()
 
                 if (mdoc != null) {
-                    claims = mdoc.jsonEncodedDetailsFiltered(claimNames)
+                    claims = if (claimNames.isNotEmpty()) {
+                        mdoc.jsonEncodedDetailsFiltered(claimNames)
+                    } else {
+                        mdoc.jsonEncodedDetailsAll()
+                    }
                 } else if (jwtVc != null) {
-                    claims = jwtVc.credentialClaimsFiltered(claimNames)
+                    claims = if (claimNames.isNotEmpty()) {
+                        jwtVc.credentialClaimsFiltered(claimNames)
+                    } else {
+                        jwtVc.credentialClaims()
+                    }
                 } else if (jsonVc != null) {
-                    claims = jsonVc.credentialClaimsFiltered(claimNames)
+                    claims = if (claimNames.isNotEmpty()) {
+                        jsonVc.credentialClaimsFiltered(claimNames)
+                    } else {
+                        jsonVc.credentialClaims()
+                    }
+                } else if (sdJwt != null) {
+                    claims = if (claimNames.isNotEmpty()) {
+                        sdJwt.credentialClaimsFiltered(claimNames)
+                    } else {
+                        sdJwt.credentialClaims()
+                    }
                 } else {
                     var type: String
                     try {

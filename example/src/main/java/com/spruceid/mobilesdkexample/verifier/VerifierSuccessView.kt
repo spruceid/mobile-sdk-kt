@@ -31,11 +31,11 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.spruceid.mobilesdkexample.R
 import com.spruceid.mobilesdkexample.ui.theme.Inter
+import com.spruceid.mobilesdkexample.ui.theme.MobileSdkTheme
 import com.spruceid.mobilesdkexample.ui.theme.TextHeader
 import com.spruceid.mobilesdkexample.ui.theme.VerifiedGreenValid
 import com.spruceid.mobilesdkexample.ui.theme.VerifiedRedInvalid
 import com.spruceid.mobilesdkexample.ui.theme.VerifierCloseButton
-import com.spruceid.mobilesdkexample.ui.theme.MobileSdkTheme
 
 @Composable
 fun VerifierSuccessView(
