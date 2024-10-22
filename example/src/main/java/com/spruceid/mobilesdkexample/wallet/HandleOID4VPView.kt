@@ -49,7 +49,7 @@ import com.spruceid.mobile.sdk.rs.ParsedCredential
 import com.spruceid.mobile.sdk.rs.PermissionRequest
 import com.spruceid.mobile.sdk.rs.PermissionResponse
 import com.spruceid.mobile.sdk.rs.RequestedField
-import com.spruceid.mobile.sdk.rs.SdJwt
+import com.spruceid.mobile.sdk.rs.Vcdm2SdJwt
 import com.spruceid.mobilesdkexample.ErrorView
 import com.spruceid.mobilesdkexample.LoadingView
 import com.spruceid.mobilesdkexample.R
@@ -98,7 +98,7 @@ fun HandleOID4VPView(
                     ParsedCredential
                         // TODO: Update to use VDC collection in the future
                         // to detect the type of credential.
-                        .newSdJwt(SdJwt.newFromCompactSdJwt(rawCredential.rawCredential))
+                        .newSdJwt(Vcdm2SdJwt.newFromCompactSdJwt(rawCredential.rawCredential))
                 } catch(_: Exception)  {
                     null
                 }

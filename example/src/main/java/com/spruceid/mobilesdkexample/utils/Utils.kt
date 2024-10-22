@@ -14,8 +14,8 @@ import com.spruceid.mobile.sdk.CredentialPack
 import com.spruceid.mobile.sdk.rs.JsonVc
 import com.spruceid.mobile.sdk.rs.JwtVc
 import com.spruceid.mobile.sdk.rs.Mdoc
-import com.spruceid.mobile.sdk.rs.SdJwt
 import com.spruceid.mobile.sdk.rs.Uuid
+import com.spruceid.mobile.sdk.rs.Vcdm2SdJwt
 import com.spruceid.mobilesdkexample.credentials.AchievementCredentialItem
 import com.spruceid.mobilesdkexample.credentials.GenericCredentialItem
 import com.spruceid.mobilesdkexample.credentials.ICredentialView
@@ -96,7 +96,7 @@ fun credentialDisplaySelector(rawCredential: String, onDelete: (() -> Unit)?): I
         try {
                 // Test if it is SdJwt
                 val credentialPack = CredentialPack()
-                credentialPack.addSdJwt(SdJwt.newFromCompactSdJwt(rawCredential))
+                credentialPack.addSdJwt(Vcdm2SdJwt.newFromCompactSdJwt(rawCredential))
                 return AchievementCredentialItem(credentialPack, onDelete)
         } catch (_: Exception) {
                 return GenericCredentialItem(rawCredential, onDelete)
@@ -110,7 +110,7 @@ fun addCredential(credentialPack: CredentialPack, rawCredential: String): Creden
         } catch (_: Exception) {}
 
         try {
-                credentialPack.addSdJwt(SdJwt.newFromCompactSdJwt(rawCredential))
+                credentialPack.addSdJwt(Vcdm2SdJwt.newFromCompactSdJwt(rawCredential))
                 return credentialPack
         } catch (_: Exception) {}
 

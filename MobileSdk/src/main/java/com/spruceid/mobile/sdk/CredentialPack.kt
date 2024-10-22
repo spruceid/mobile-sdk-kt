@@ -4,7 +4,7 @@ import com.spruceid.mobile.sdk.rs.JsonVc
 import com.spruceid.mobile.sdk.rs.JwtVc
 import com.spruceid.mobile.sdk.rs.Mdoc
 import com.spruceid.mobile.sdk.rs.ParsedCredential
-import com.spruceid.mobile.sdk.rs.SdJwt
+import com.spruceid.mobile.sdk.rs.Vcdm2SdJwt
 import org.json.JSONObject
 
 /**
@@ -48,7 +48,7 @@ class CredentialPack {
     /**
      * Add a SD-JWT to the CredentialPack.
      */
-    fun addSdJwt(sdJwt: SdJwt): List<ParsedCredential> {
+    fun addSdJwt(sdJwt: Vcdm2SdJwt): List<ParsedCredential> {
         credentials.add(ParsedCredential.newSdJwt(sdJwt))
         return credentials
     }
