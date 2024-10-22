@@ -3,7 +3,7 @@ package com.spruceid.mobile.sdk
 import com.spruceid.mobile.sdk.rs.JsonVc
 import com.spruceid.mobile.sdk.rs.JwtVc
 import com.spruceid.mobile.sdk.rs.Mdoc
-import com.spruceid.mobile.sdk.rs.SdJwt
+import com.spruceid.mobile.sdk.rs.Vcdm2SdJwt
 import org.json.JSONException
 import org.json.JSONObject
 import org.json.JSONTokener
@@ -99,9 +99,9 @@ fun JsonVc.credentialClaimsFiltered(claimNames: List<String>): JSONObject {
 }
 
 /**
- * Access the SD-JWT credential.
+ * Access the VCDM 2.0 SD-JWT credential.
  */
-fun SdJwt.credentialClaims(): JSONObject {
+fun Vcdm2SdJwt.credentialClaims(): JSONObject {
     try {
         return JSONObject(this.revealedClaimsAsJsonString())
     } catch (e: Error) {
@@ -111,9 +111,9 @@ fun SdJwt.credentialClaims(): JSONObject {
 }
 
 /**
- * Access the specified claims from the SD-JWT credential.
+ * Access the specified claims from the VCDM 2.0 SD-JWT credential.
  */
-fun SdJwt.credentialClaimsFiltered(claimNames: List<String>): JSONObject {
+fun Vcdm2SdJwt.credentialClaimsFiltered(claimNames: List<String>): JSONObject {
     val old = this.credentialClaims()
     val new = JSONObject()
     for (name in claimNames) {
