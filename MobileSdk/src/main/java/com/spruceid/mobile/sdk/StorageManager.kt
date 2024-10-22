@@ -13,7 +13,7 @@ class StorageManager(val context: Context) : StorageManagerInterface {
     /// Arguments:
     /// key - The key to add
     /// value - The value to add under the key
-    override suspend fun add(key: String, value: ByteArray) =
+    override fun add(key: String, value: ByteArray) =
         context.openFileOutput(filename(key), 0).use { it.write(encrypt(value)) }
 
 
@@ -23,7 +23,7 @@ class StorageManager(val context: Context) : StorageManagerInterface {
     ///
     /// Arguments:
     /// key - The key to retrieve
-    override suspend fun get(key: String): ByteArray {
+    override fun get(key: String): ByteArray {
         val bytes = ByteArray(0)
         context.openFileInput(filename(key)).use { it.read(bytes) }
         return decrypt(bytes)
@@ -35,7 +35,7 @@ class StorageManager(val context: Context) : StorageManagerInterface {
     ///
     /// Arguments:
     /// key - The key to remove
-    override suspend fun remove(key: String) {
+    override fun remove(key: String) {
         File(context.filesDir, filename(key)).delete()
     }
 
@@ -43,7 +43,7 @@ class StorageManager(val context: Context) : StorageManagerInterface {
     /// Function: list
     ///
     /// Lists all key-value pair in storage
-    override suspend fun list(): List<String> {
+    override fun list(): List<String> {
         val list = context.filesDir.list() ?: throw Exception("cannot list stored objects")
 
         return list.mapNotNull {
