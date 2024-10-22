@@ -103,7 +103,7 @@ fun JsonVc.credentialClaimsFiltered(claimNames: List<String>): JSONObject {
  */
 fun SdJwt.credentialClaims(): JSONObject {
     try {
-        return JSONObject(this.decodeRevealJsonString())
+        return JSONObject(this.revealedClaimsAsJsonString())
     } catch (e: Error) {
         print("failed to decode SD-JWT data from UTF-8-encoded JSON")
         return JSONObject()
