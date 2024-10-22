@@ -141,27 +141,39 @@ fun HandleOID4VPView(
         if (permissionRequest == null) {
             LoadingView(loadingText = "Loading...")
         } else if (permissionResponse == null) {
-            CredentialSelector(
-                credentials = permissionRequest!!.credentials(),
-                credentialClaims = credentialClaims,
-                getRequestedFields = { credential -> permissionRequest!!.requestedFields(credential) },
-                onContinue = { selectedCredentials ->
-                    scope.launch {
-                        try {
-                            // TODO: support multiple presentation
-                            selectedCredential = selectedCredentials.first()
-                            permissionResponse = permissionRequest!!.createPermissionResponse(
-                                selectedCredential!!
-                            )
-                        } catch (e: Exception) {
-                            err = e.localizedMessage
+            if(permissionRequest!!.credentials().isNotEmpty()) {
+                CredentialSelector(
+                    credentials = permissionRequest!!.credentials(),
+                    credentialClaims = credentialClaims,
+                    getRequestedFields = { credential ->
+                        permissionRequest!!.requestedFields(
+                            credential
+                        )
+                    },
+                    onContinue = { selectedCredentials ->
+                        scope.launch {
+                            try {
+                                // TODO: support multiple presentation
+                                selectedCredential = selectedCredentials.first()
+                                permissionResponse = permissionRequest!!.createPermissionResponse(
+                                    selectedCredential!!
+                                )
+                            } catch (e: Exception) {
+                                err = e.localizedMessage
+                            }
                         }
+                    },
+                    onCancel = {
+                        onBack()
                     }
-                },
-                onCancel = {
-                    onBack()
-                }
-            )
+                )
+            } else {
+                ErrorView(
+                    errorTitle = "No matching credential(s)",
+                    errorDetails = "There are no credentials in your wallet that match the verification request you have scanned",
+                    closeButtonLabel = "Cancel"
+                ) { onBack() }
+            }
         } else {
             DataFieldSelector(
                 requestedFields = permissionRequest!!.requestedFields(selectedCredential!!),
