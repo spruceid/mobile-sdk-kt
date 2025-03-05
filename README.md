@@ -1,5 +1,8 @@
 # Kotlin Mobile SDK
 
+> [!IMPORTANT]
+> This repo has been archived in favor of a monorepo, please see https://github.com/spruceid/sprucekit-mobile.
+
 ## Maturity Disclaimer
 
 In its current version, Mobile SDK has not yet undergone a formal security audit
